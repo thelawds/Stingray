@@ -1,0 +1,69 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Stingray",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#terminals"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.stingray",
+				"match": "\\b(if|while|for|declare|as|of|with|from|class|interface|in|else)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.single.stingray",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.stingray",
+					"match": "\\\\."
+				}
+			]
+		},
+		"terminals": {
+			"patterns": [
+				{
+					"name": "constant.numeric.stingray",
+					"match": "\\b(?:([1-9][0-9]*)|(0[0-7]*)|0x([0-9A-F]+)|0b([01]+))(L)?\\b"
+				},
+				{
+					"name": "constant.language.stingray",
+					"match": "\\b(empty|true|false)\\b"
+				},
+				{
+					"name" : "entity.name.type.stingray",
+					"match": "\\b([A-Z]\\w*|Nothing)\\b"
+				},
+				{
+					"name": "entity.name.function.stingray",
+					"match": "\\b(not|and|xor|or)\\b"
+				},
+				{
+					"name" : "entity.name.tag.stingray",
+					"match": "\\w+"
+				},
+				{
+					"name" : "comment.line.double-slash.stingray",
+					"begin": "//",
+					"end": "\n"
+				},
+				{
+					"name": "comment.block.stingray",
+					"begin": "\\/\\*",
+					"end": "\\*\\/"
+				}
+			]
+		}
+	},
+	"scopeName": "source.stingray"
+}

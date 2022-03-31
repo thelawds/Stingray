@@ -1,0 +1,92 @@
+// hello
+
+declare Serializable as interface {
+
+/*
+    Multi-line comment here!
+
+*/
+
+    + serialize: Nothing -> Nothing // todo + means public
+    + deserialize: File -> Serializable
+
+}
+
+declare Visitor of T as interface {
+    + visitTree : Tree -> T
+}
+
+declare VisitorImpl of Integer as Visitor class {
+    + visitTree : Tree of Integer t -> Integer {t.value + 1}
+}
+
+declare Visitable as interface {
+    + accept : Visitor<Object?> -> Object?
+}
+
+declare Tree 
+of T0 from Serializable with < + >, < <= > , <String> // T + T, T <= T, String(T)
+   T1
+   T2 with <->, <*> 
+as Visitable class (
+    + className!                                        <- "Tree"
+    - lastReturnedValue             : T?                <- empty
+    ~ otherExampleOfInitialization  : String            {"Hello, world!"}
+    - array                         : List<String>      <- List.of("hello", "world")
+
+    + new: T value -> Tree <- Tree(empty, empty, value)     // constructors
+    + new: () -> Tree { Tree(empty, empty, empty)}
+
+){
+    ~ left   : Tree? // ~ means protected, ? means optional
+    ~ right  : Tree?
+    + value! : T     // ! means it is constant
+
+    + doSomething : String s -> T {
+        this.value + s
+    }
+
+    - doSomethingElse : String s2 -> Tree <- s2 + this.value 
+
+    + < <= > :  Tree right -> Boolean <- this.value <= right.value
+    - < <= > :  Tree r -> Boolean {throw Exception("AAA!")} 
+
+    + <String> : Nothing -> String <- this.value
+
+    +  < <= > : Nothing -> Tree {
+        //does something
+        return this
+    }
+
+    + <+> : Tree r -> Tree {
+        value <- this.value + r.value - 312.32
+        return Tree(value)
+    }
+
+    + <String> : Nothing -> String { // Type is optional here, should be deduced automatically
+
+    }
+
+    + accept : Visitor<Object?, Object?> v -> Object? {
+        return v.visitTree(this);
+    }
+    //... 
+}
+
+
+declare Node as class {
+    // Nothing new here ...
+}
+
+declare FunctionTypeExample as (Int, Int) -> Double
+
+declare SyntaxTree of Node as Serializable Tree { // Last one is a Class or class keyword or interface keyword
+    + serialize : SuntaxTree this -> Nothing {
+            // does something
+    }
+
+    + deserialize : (SyntaxTree this, File f) -> SyntaxTree {
+        // does something
+    } 
+}
+

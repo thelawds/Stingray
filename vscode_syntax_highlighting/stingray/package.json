@@ -1,0 +1,27 @@
+{
+    "name": "stingray",
+    "displayName": "stingray",
+    "description": "Syntax Highlighting for Stingray Programming Language",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.65.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "stingray",
+            "aliases": ["Stingray", "stingray"],
+            "extensions": [".stingray",".sg"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [
+            {
+                "language": "stingray",
+                "scopeName": "source.stingray",
+                "path": "./syntaxes/stingray.tmLanguage.json"
+            }
+        ]
+    }
+}

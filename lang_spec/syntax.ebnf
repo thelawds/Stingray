@@ -1,0 +1,48 @@
+
+operator ::= '#' | '+' | '-' | '*' | '/' | '%' | '^' | '=' | '<' | '<=' | '[' ']'
+
+Program ::= {Declaration}
+
+Declaration ::= 'declare' ClassDeclaration
+              | 'declare' FunctionTypeDeclaration
+
+TypeReference ::= 'Nothing' | identifier ['<' TypeReference {',' TypeReference} '>'] ['?'] | FunctionType | NamedFunctionType
+
+FunctionTypeDeclaration ::= identifier 'as' FunctionType
+FunctionType            ::= FunctionRangeDomain '->' FunctionRangeDomain
+FunctionRangeDomain     ::= TypeReference | '(' [TypeReference {',' TypeReference}] ')'
+NamedFunctionRange      ::= TypeReference identifier | '(' [TypeReference identifier {',' TypeReference identifier}] ')'
+NamedFunctionType       ::= NamedFunctionRange '->' NamedFunctionRange
+
+ClassDeclaration ::= identifier [GenericsList] 'as' [ExtendsList] ['(' StaticsBody ')'] '{' [ClassBody] '}'
+GenericsList     ::= 'of' Generic {Generic}
+Generic          ::= identifier 'from' identifier {',' identifier}] ['with' SupportElement {',' SupportElement}]
+ExtendsList      ::= {ExtendsClass} (ExtendsClass | 'class' | 'interface')
+ExtendsClass     ::= identifier ['of' identifier {identifier}]
+SupportElement   ::= '<' ( TypeReference | operator )'>'
+
+StaticsBody      ::= FieldDefinition {FieldDefinition}
+ClassBody        ::= {FieldDefinition}
+
+FieldDefinition  ::= Visibility FieldName ['!'] [':' TypeReference] [Value]
+FieldName        ::= identifier | '<' (TypeReference | operator) '>'
+Visibility       ::= '+' | '-' | '~'
+Value            ::= '<-' Expression | '{' Expression {Expression} '}'
+Body             ::= '{' {Expression} '}'
+
+Term            ::= '(' Expression ')'
+                  | [Unop] identifier { ('.' identifier | '[' Expression ']' | '(' [Expression {',' Expression}] ')') } 
+                  | ('true' | 'false' | 'empty')
+
+VarDefinition    ::= identifier ['!'] { ',' identifier ['!'] } [':' TypeReference] [Value]
+Expression       ::= Term
+                   | Term Binop Term 
+                   | VarDefinition
+                   | IfExpression
+                   | 'while' Expression Body
+                   | 'for' identifier 'in' Expression Body # Here Expression should be something iterable 
+
+IfExpression    ::= 'if' Expression Body 'else' (IfExpression | Body)
+
+Unop    ::= '#' | '+' | '-' | 'not'
+Binop   ::= '=' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/' | '%' | '^' | 'and' | 'xor' | 'or' | '=>' | '<=>' | 'is'
