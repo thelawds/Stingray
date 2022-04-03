@@ -1,0 +1,116 @@
+import system.io.readInt as readInt
+import system.io.print as print
+
+declare fact as Integer n -> Integer {
+
+    if n = 0 {
+        return 1
+    } else {
+        return n * fact(n-1)
+    }
+
+}
+
+declare fib as Integer n -> Integer {
+    if n = 0 or n = 1 {
+        return 1
+    } else {
+        return fib(n-1) + fib(n-2)
+    }
+}
+
+declare main as String[] args -> Nothing {
+    queriesCnt <- Integer.parseInt(args[1])
+
+    fibNumbers: IntegerVector // Default constructor is called
+    factNumbers <- new IntegerVector(queriesCnt)
+
+    for _ in [0; queriesCnt) {
+        q <- readInt
+        fibNumbers.add(fib(q))
+        factNumbers.add(fact(q))
+    }
+
+    for q in [0; queriesCnt) {
+        print("Fib " + q + " is " + fib[q])
+        print("Fact " + q + " is " + fact[q])
+    }
+
+    fibNumbers.clear()
+    factNumbers.clear()
+}
+
+declare IntegerCollection as interface {
+    add:        Integer -> Boolean
+    remove:     Integer -> Boolean
+    size:       Nothing -> Boolean
+    forEach:    (Integer -> Nothing) -> Nothing
+}
+
+declare IntegerVector as IntegerCollection {
+    data:       Integer[10] <- []
+    size:       Integer     <- 0
+    capacity:   Integer     <- 10
+
+    new: Integer size -> IntegerVector {
+        this.capacity   <- size
+        this.data       <- new Integer[size]
+    }
+
+    add: Integer el -> Boolean {
+        if size = capacity {
+            newData  <- new Integer[capacity * 2]
+            capacity <- capacity * 2
+
+            for i in [0; size) {
+                newData[i] <- data[i]
+            }
+            
+            data <- newData
+        }
+
+        data[size] <- el;
+        size <- size + 1
+        return true
+    }
+
+    remove: Integer el -> Boolean {
+        idx <- -1
+
+        for i in [0; size) {
+            if data[i] = el {
+                idx <- i
+            }
+        }
+
+        if id = -1 {
+            return false
+        }
+
+        for i in [idx; size - 1) {
+            data[i] <- data[i+1]
+        }
+
+        size = size - 1
+        return true
+    }
+
+
+    size: Nothing -> Integer <- size
+
+    forEach: Integer -> Nothing f -> Nothing {
+        for i in [0; size) {
+            f(data[i])
+        }
+    }
+
+    
+    remove: Integer el -> Nothing {
+        remove(el)
+    }
+
+    clear: Nothing -> Nothing {
+        forEach(this::remove)
+    }
+
+}

@@ -1,0 +1,57 @@
+
+Program ::= {Import} {Declaration}
+
+Import ::= 'import' identifier {'.' identifier} 'as' identifier
+
+Declaration ::= 'declare' identifier as TypeReference
+
+TypeReference ::= 'Nothing' | identifier | FunctionDeclarationType | FunctionDefinitionType | ClassType
+TypeReference ::= identifier '[]'
+
+FunctionDeclarationType ::= FunctionRangeDomain '->' FunctionRangeDomain
+FunctionDefinitionType  ::= NamedFunctionRange '->' FunctionRangeDomain Body
+FunctionRangeDomain     ::= TypeReference | '(' [TypeReference {',' TypeReference}] ')'
+NamedFunctionRange      ::= TypeReference identifier | '(' [TypeReference identifier {',' TypeReference identifier}] ')'
+
+ClassType        ::= [ExtendsList] ['(' StaticsBody ')'] '{' [ClassBody] '}'
+ExtendsList      ::= {identifier} (identifier | 'class' | 'interface')
+StaticsBody      ::= FieldDefinition {FieldDefinition}
+ClassBody        ::= {FieldDefinition}
+
+FieldDefinition  ::= identifier [':' TypeReference] [Value]
+Value            ::= '<-' Expression | '{' Expression '}'
+Body             ::= '{' {Statement} '}'
+
+Statement        ::= identifier [':' TypeReference] [Value]
+                   | IfStatement
+                   | 'while' Expression Body
+                   | 'for' identifier 'in' RangeExpr Body
+                   | 'return' Expression
+
+IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]
+
+
+LambdaExpression ::= NamedFunctionRange '->' (Expression | Body) 
+                   | '(' [identifier {',' identifier}] ')' -> (Expression | Body)
+
+MethodReference  ::= identifier '::' identifier
+
+Expression ::= Term [Binop Term] | LambdaExpression | MethodReference
+ArrayRef     ::= Term '[' Expression ']'
+FunctionCall ::= Term '(' [Expression {',' Expression}] ')'
+FieldRef     ::= Term '.' identifier
+Term         ::= '(' Expression ')'
+               | [Unop] Term
+               | ArrayRef
+               | FunctionCall
+               | FieldRef
+               | ('true' | 'false' | 'empty')
+               | '[' [Expression {',' Expression}] ']'
+               | RangeExpr
+
+RangeOpening    ::= '[' | '('
+RangeClosing    ::= ']' | ')'
+RangeExpr       ::= RangeOpening Expression ';' Expression RangeClosing [':' Expression]
+
+Unop    ::= '#' | '+' | '-' | 'not'
+Binop   ::= '=' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/' | '%' | '^' | 'and' | 'xor' | 'or' | '=>' | '<=>' | 'is' 
