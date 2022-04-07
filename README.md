@@ -9,10 +9,10 @@ Stingray is object-oriented, functional general purpose programming language sup
 Stingray source files have the extension of `.stingray` or `.sg`
 
 # Stages:
-- [ ] Expressions, Function Declarations
+- [ ] Expressions, Function Declarations, Type Ascription
 - [ ] Control-Flow, Function Calls
 - [ ] Class Declarations, Inheritance
-- [ ] Imports System
+- [ ] Arrays, Imports System
 - [ ] Type Inference
 
 ## Basic Types:
