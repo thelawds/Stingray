@@ -1,9 +1,62 @@
+comment "//" ;
+comment "/*" "*/" ;
 
-EAdd. Exp ::= Exp "+" Exp1;
-ESub. Exp ::= Exp "+" Exp1;
-EMul. Exp1 ::= Exp1 "*" Exp2;
-EDiv. Exp1 ::= Exp1 "/" Exp2;
+Program.                        Program_ ::= [Expression];
+terminator Expression ";";
 
-EInt. Exp2 ::= Integer;
+MethodReference.                Expression ::= Ident "::" Ident;
 
-coercions Exp 2;
+RelationalEquals.               Expression5 ::= Expression5 "=" Expression6;
+RelationalNotEquals.            Expression5 ::= Expression5 "!=" Expression6;
+RelationalLess.                 Expression5 ::= Expression5 "<" Expression6;
+RelationalGreater.              Expression5 ::= Expression5 ">" Expression6;
+RelationalLessOrEqual.          Expression5 ::= Expression5 "<=" Expression6;
+RelationalGreaterOrEqual.       Expression5 ::= Expression5 ">=" Expression6;
+
+ArithmeticSum.                  Expression6 ::= Expression6 "+" Expression7;
+ArithmeticDifference.           Expression6 ::= Expression6 "-" Expression7;
+ArithmeticProduct.              Expression7 ::= Expression7 "*" Expression8;
+ArithmeticQuotient.             Expression7 ::= Expression7 "/" Expression8;
+ArithmeticModulus.              Expression7 ::= Expression7 "%" Expression8;
+ArithmeticExponentiation.       Expression8 ::= Expression8 "^" Expression9;
+
+LogicalUnaryNot.                Expression4 ::= "not" Expression3;
+LogicalConjunction.             Expression3 ::= Expression3 "and" Expression4;
+LogicalDisjunction.             Expression2 ::= Expression2 "or" Expression3;
+LogicalExclusiveDisjunction.    Expression2 ::= Expression2 "xor" Expression3;
+LogicalImplication.             Expression1 ::= Expression1 "=>" Expression2;
+LogicalEquivalence.             Expression1 ::= Expression1 "<=>" Expression2;
+
+_.                              Expression9 ::= "(" Expression ")";
+
+coercions Expression 10;
+
+UnaryHashCode.                  Expression9 ::= "#" Expression10;
+UnaryMinus.                     Expression9 ::= "-" Expression10;
+
+TrueTerm.                       Expression10 ::= "true";
+FalseTerm.                      Expression10 ::= "false";
+EmptyTerm.                      Expression10 ::= "empty";
+StringTerm.                     Expression10 ::= String;
+IntegerTerm.                    Expression10 ::= Integer;
+DoubleTerm.                     Expression10 ::= Double;
+VariableReferenceTerm.          Expression10 ::= Ident;
+
+ArrayReferenceTerm.             Expression10 ::= Expression10 "[" Expression "]";
+FieldReferenceTerm.             Expression10 ::= Expression10 "." Ident;
+
+FunctionCall.                   Expression10 ::= Expression10 "(" [Expression] ")";
+separator Expression ",";
+
+ArrayInitializer.               Expression10 ::= "[" [Expression] "]";
+separator Expression ",";
+
+RangeExpression.                Expression10 ::= UnsteppedRangeExpression;
+SteppedRangeExpression.         Expression10 ::= UnsteppedRangeExpression ":" Integer;
+
+OpenRange.                      UnsteppedRangeExpression ::= "(" RangeBody_ ")";
+ClosedRange.                    UnsteppedRangeExpression ::= "[" RangeBody_ "]";
+LeftClosedRightOpenedRange.     UnsteppedRangeExpression ::= "[" RangeBody_ ")";
+LeftOpenedRightClosedRange.     UnsteppedRangeExpression ::= "(" RangeBody_ "]";
+
+RangeBody.                      RangeBody_ ::= Integer ";" Integer;

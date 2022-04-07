@@ -8,6 +8,17 @@ Stingray is object-oriented, functional general purpose programming language sup
 
 Stingray source files have the extension of `.stingray` or `.sg`
 
+## Basic Types:
+Stingray allows for some of the following basic types:
+- Integer (i32)
+- Long    (i64)
+- Float   (f32)
+- Double  (f64)
+- Boolean (i1)
+- Char    (i8)
+- String  (i8[]) ?
+- Nothing
+
 ## Program Structure
 
 Program consists of import statements and declarations:
@@ -240,7 +251,30 @@ declare IntegerVector as IntegerCollection {
 }
 ```
 
+# Operator Precedences in Expressions:
+Here are some operator preferences, from lowes to greatest (first line - lowest precedence, last line - highest)
+- =>, <=>
+- or, xor
+- and
+- not
+- =, !=, <, >, <=, >=
+- +, -
+- *, /, %
+- ^
+- #, -
+- [], ., ()
+
+
 # Project Requirenments:
 - Flex >= 2.6.4
 - Bison >= 3.8.2
 - BNFC >= 2.9.4
+
+# Building the project:
+1. Build BNFC syntax with `bnfc --cpp -m stingray.cf -o syntax/` being in `compiler/` directory.
+2. Compile project using cmake
+
+# Before you Commit:
+1. Clear syntax directory by calling `make distclean` being in `compiler/syntax/` directory.
+2. Make sure to run `clang-format`
+3. Work in your own separate branch

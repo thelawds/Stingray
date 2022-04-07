@@ -30,28 +30,31 @@ Statement        ::= identifier [':' TypeReference] [Value]
 
 IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]
 
-
 LambdaExpression ::= NamedFunctionRange '->' (Expression | Body) 
                    | '(' [identifier {',' identifier}] ')' -> (Expression | Body)
 
-MethodReference  ::= identifier '::' identifier
+MethodReference  ::= identifier '::' identifier # done
 
-Expression ::= Term [Binop Term] | LambdaExpression | MethodReference
-ArrayRef     ::= Term '[' Expression ']'
-FunctionCall ::= Term '(' [Expression {',' Expression}] ')'
-FieldRef     ::= Term '.' identifier
-Term         ::= '(' Expression ')'
-               | [Unop] Term
-               | ArrayRef
-               | FunctionCall
-               | FieldRef
-               | ('true' | 'false' | 'empty')
-               | '[' [Expression {',' Expression}] ']'
-               | RangeExpr
+Expression ::= Unop Expression # done
+             | Term [Binop Term] # done
+             | LambdaExpression 
+             | MethodReference # done
+ArrayRef     ::= Term '[' Expression ']' # done
+FunctionCall ::= Term '(' [Expression {',' Expression}] ')' # done
+FieldRef     ::= Term '.' identifier # done
+Term         ::= '(' Expression ')' # done
+               | ArrayRef # done
+               | FunctionCall #done
+               | FieldRef # done
+               | ('true' | 'false' | 'empty') # done
+               | (numeric | string | identifier) # done
+               | '[' [Expression {',' Expression}] ']' # done
+               | RangeExpr # done
 
-RangeOpening    ::= '[' | '('
-RangeClosing    ::= ']' | ')'
-RangeExpr       ::= RangeOpening Expression ';' Expression RangeClosing [':' Expression]
+RangeOpening    ::= '[' | '(' # done
+RangeClosing    ::= ']' | ')' # done
+RangeExpr       ::= RangeOpening Expression ';' Expression RangeClosing [':' Expression] # done
 
-Unop    ::= '#' | '+' | '-' | 'not'
-Binop   ::= '=' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/' | '%' | '^' | 'and' | 'xor' | 'or' | '=>' | '<=>' | 'is' 
+Unop    ::= '#' | '-' | 'not'
+Binop   ::= '=' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/' | '%' | '^' | 'and' | 'xor' | 'or' | '=>' | '<=>' 
+          | 'is' # Now not implemented
