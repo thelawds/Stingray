@@ -1,8 +1,55 @@
 comment "//" ;
 comment "/*" "*/" ;
 
-Program.                        Program_ ::= [Expression];
-terminator Expression ";";
+Program.                        Program_ ::= [Decl];
+terminator Decl "";
+
+Declaration.                    Decl ::= "declare" Ident "as" TypeReference;
+
+UserType.                       TypeReference ::= Ident;
+NothingType.                    TypeReference ::= "Nothing";
+BoolType.                       TypeReference ::= "Boolean";
+IntegerType.                    TypeReference ::= "Integer";
+DoubleType.                     TypeReference ::= "Double";
+StringType.                     TypeReference ::= "String";
+FunctionDeclType.               TypeReference ::= FuncDecl;
+FunctionDefType.                TypeReference ::= FuncDefn;
+ArrayType.                      TypeReference ::= TypeReference "[]";
+
+FunctionDeclaration.            FuncDecl ::= FuncRange "->" FuncDomain;
+FunctionDefinition.             FuncDefn ::= FuncRangeNamed "->" FuncDomain Body_;
+
+FunctionDomain.                 FuncDomain ::= TypeReference;
+FunctionRangeSingle.            FuncRange  ::= TypeReference;
+FunctionRangeMultiple.          FuncRange  ::= "(" TypeReference "," [TypeReference] ")";
+separator TypeReference ",";
+
+FunctionParameter.              FuncParam ::= TypeReference Ident;
+
+FunctionRangeSingleNamed.       FuncRangeNamed ::= FuncParam;
+FunctionRangeMultipleNamed.     FuncRangeNamed ::= "(" [FuncParam] ")";
+separator FuncParam ",";
+
+
+StatementVarDecl.               Statement ::= Ident ":" TypeReference;
+StatementVarDef.                Statement ::= Ident Value;
+StatementVarDefAsc.             Statement ::= Ident ":" TypeReference Value;
+StatementIf.                    Statement ::= StatementIf_;
+StatementWhile.                 Statement ::= "while" Expression Body_;
+StatementFor.                   Statement ::= "for" Ident "in" RangeExpr Body_;
+StatementReturnNone.            Statement ::= "return";
+StatementReturnValue.           Statement ::= "return" Expression;
+
+IfStatement.                    StatementIf_ ::= "if" Expression Body_;
+IfElseIfStatement.              StatementIf_ ::= "if" Expression Body_ "else" StatementIf_;
+IfElseStatement.                StatementIf_ ::= "if" Expression Body_ "else" Body_;
+
+Body.                           Body_ ::= "{" [Statement] "}";
+
+ValueArrowed.                   Value ::= "<-" Expression;
+ValueBraced.                    Value ::= "{" Expression "}";
+
+terminator Statement "";
 
 MethodReference.                Expression ::= Ident "::" Ident;
 
@@ -51,8 +98,10 @@ separator Expression ",";
 ArrayInitializer.               Expression10 ::= "[" [Expression] "]";
 separator Expression ",";
 
-RangeExpression.                Expression10 ::= UnsteppedRangeExpression;
-SteppedRangeExpression.         Expression10 ::= UnsteppedRangeExpression ":" Integer;
+RangeExpressionTerm.            Expression10 ::= RangeExpr;
+
+RangeExpression.                RangeExpr ::= UnsteppedRangeExpression;
+SteppedRangeExpression.         RangeExpr ::= UnsteppedRangeExpression ":" Integer;
 
 OpenRange.                      UnsteppedRangeExpression ::= "(" RangeBody_ ")";
 ClosedRange.                    UnsteppedRangeExpression ::= "[" RangeBody_ "]";

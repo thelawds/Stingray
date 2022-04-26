@@ -1,1 +1,26 @@
-[x, y, z][0].Second + 31.2
+
+declare sayHello as () -> Nothing {
+
+}
+
+declare main as String[] args -> Nothing {
+
+    x : Double {empty}
+    y <- 12.32
+    x <- 43
+    z {x = y}
+    f <- (12 + x < 45 + y) and (12 < 13) or "abc" <= "abcd" and empty
+
+    if (f) {
+        for i in [1; 5] {
+            r <- i + "gello"
+        }
+    } else if (z) {
+        f <- true
+    } else {
+        bar <- 1212
+        return 12 + bar
+    }
+
+}
+

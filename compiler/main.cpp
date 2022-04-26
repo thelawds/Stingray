@@ -6,6 +6,7 @@
 #include "syntax/Parser.H"
 #include "syntax/ParserError.H"
 #include "syntax/Printer.H"
+#include "typecheck/TypeChecker.h"
 
 void usage() {
     printf("usage: Call with one of the following argument combinations:\n");
@@ -52,14 +53,20 @@ int main(int argc, char **argv) {
     }
 
     if (parse_tree) {
-        printf("\nParse Successful!\n");
         if (!quiet) {
-            printf("\n[Abstract Syntax]\n");
-            auto *s = new ShowAbsyn();
-            printf("%s\n\n", s->show(parse_tree));
-            printf("[Linearized Tree]\n");
+//            printf("\n[Abstract Syntax]\n");
+//            auto *s = new ShowAbsyn();
+//            printf("%s\n\n", s->show(parse_tree));
+            printf("[Program Linearized Tree]\n");
             auto *p = new PrintAbsyn();
             printf("%s\n\n", p->print(parse_tree));
+
+            auto *pTypeChecker = new TypeChecker();
+            pTypeChecker->visitProgram_(parse_tree);
+
+            delete p;
+//            delete s;
+            delete pTypeChecker;
         }
         delete (parse_tree);
         return 0;

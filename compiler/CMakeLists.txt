@@ -34,7 +34,7 @@ set(
         syntax/Skeleton.C
         syntax/Skeleton.H
         syntax/ParserError.H
-)
+        typecheck/TypeChecker.cpp typecheck/TypeChecker.h typecheck/BaseTypes.cpp typecheck/StingrayTypes.cpp typecheck/StingrayTypes.h typecheck/Expressions.cpp typecheck/Statements.cpp typecheck/Unused.cpp typecheck/TopLevelDeclarations.cpp)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} syntax/)
 

@@ -136,6 +136,39 @@ Semantics for operators `=>` and `<=>`:
 - `a => b` is equivalent to `not a or b`
 - `a <=> b` is equivalent to `a and b or not a and not b`
 
+# Operational Semantics, Typing Rules and Type Conversions:
+## Arithmetic and Relational Expressions:
+If arguments in arithmetic expression have different types, then one is converted to another: from smallest to largest. E. g. `Char -> Integer -> Long -> Float -> Double` and then typing rules are applied.
+
+Arithmetic:
+- Any Integer literal has type `Integer`. Any Floating-Point literal has type `Double`.
+- if `a:T, b:T` then `(a + b): T`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a - b): T`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a * b): T`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a / b): T`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a % b): T`, where `T in {Char, Integer, Long}`
+- if `a:T, b:T` then `(a ^ b): T`, where `T in {Char, Integer, Long, Float, Double}`
+
+Relational:
+- if `a:T, b:T` then `(a <  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a <= b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a >  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a >= b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a =  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a != b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+
+## Logical Expressions:
+If any of the arguments have numeric type - `Char, Integer, Long, Float, Double`, then it is converted to `Boolean` using the following rule:
+
+`a: Num => a' := (a != 0): Boolean`, where `Num in {Char, Integer, Long, Float, Double}`.
+
+- `true: Boolean, false: Boolean`
+- if `a:Boolean, b:Boolean` then `(a and b): Boolean`
+- if `a:Boolean, b:Boolean` then `(a or b): Boolean`
+- if `a:Boolean, b:Boolean` then `(a xor b): Boolean`
+- if `a:Boolean, b:Boolean` then `(a => b): Boolean`
+- if `a:Boolean, b:Boolean` then `(a <=> b): Boolean`
+
 # Program Example
 ```java
 import system.io.readInt as readInt

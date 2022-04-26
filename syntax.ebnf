@@ -3,32 +3,34 @@ Program ::= {Import} {Declaration}
 
 Import ::= 'import' identifier {'.' identifier} 'as' identifier
 
-Declaration ::= 'declare' identifier as TypeReference
+Declaration ::= 'declare' identifier as TypeReference #done
 
-TypeReference ::= 'Nothing' | identifier | FunctionDeclarationType | FunctionDefinitionType | ClassType
-TypeReference ::= identifier '[]'
+TypeReference ::= 'Nothing' | identifier | FunctionDeclarationType | FunctionDefinitionType #done
+               | ClassType
+               | identifier '[]' #done
 
-FunctionDeclarationType ::= FunctionRangeDomain '->' FunctionRangeDomain
-FunctionDefinitionType  ::= NamedFunctionRange '->' FunctionRangeDomain Body
-FunctionRangeDomain     ::= TypeReference | '(' [TypeReference {',' TypeReference}] ')'
-NamedFunctionRange      ::= TypeReference identifier | '(' [TypeReference identifier {',' TypeReference identifier}] ')'
+FunctionDeclarationType ::= FunctionRangeDomain '->' FunctionRangeDomain #done
+FunctionDefinitionType  ::= NamedFunctionRange '->' FunctionRangeDomain Body #done
+FunctionRangeDomain     ::= TypeReference | '(' [TypeReference {',' TypeReference}] ')' #done
+NamedFunctionRange      ::= TypeReference identifier                                    #done
+                         | '(' [TypeReference identifier {',' TypeReference identifier}] ')' #done
 
 ClassType        ::= [ExtendsList] ['(' StaticsBody ')'] '{' [ClassBody] '}'
 ExtendsList      ::= {identifier} (identifier | 'class' | 'interface')
 StaticsBody      ::= FieldDefinition {FieldDefinition}
 ClassBody        ::= {FieldDefinition}
 
-FieldDefinition  ::= identifier [':' TypeReference] [Value]
-Value            ::= '<-' Expression | '{' Expression '}'
-Body             ::= '{' {Statement} '}'
+FieldDefinition  ::= identifier [':' TypeReference] [Value] # done
+Value            ::= '<-' Expression | '{' Expression '}' # done
+Body             ::= '{' {Statement} '}' # done
 
-Statement        ::= identifier [':' TypeReference] [Value]
-                   | IfStatement
-                   | 'while' Expression Body
-                   | 'for' identifier 'in' RangeExpr Body
-                   | 'return' Expression
+Statement        ::= identifier [':' TypeReference] [Value] # done
+                   | IfStatement # done
+                   | 'while' Expression Body # done
+                   | 'for' identifier 'in' RangeExpr Body  # done
+                   | 'return' Expression  # done
 
-IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]
+IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]  #done
 
 LambdaExpression ::= NamedFunctionRange '->' (Expression | Body) 
                    | '(' [identifier {',' identifier}] ')' -> (Expression | Body)
