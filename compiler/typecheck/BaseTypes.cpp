@@ -14,15 +14,19 @@ void TypeChecker::visitIntegerTerm(IntegerTerm *p) { returnValue(new SgBaseType(
 void TypeChecker::visitDoubleTerm(DoubleTerm *p) { returnValue(new SgBaseType(EBaseType::DOUBLE)); }
 
 void TypeChecker::visitVariableReferenceTerm(VariableReferenceTerm *p) {
-    if (symbolTable.contains(p->ident_)) {
-        returnValue(symbolTable.at(p->ident_));
+    if (newSymbolTable.contains(p->ident_)) {
+        returnValue(newSymbolTable[p->ident_]);
     } else {
         error("Variable " + p->ident_ + " is not declared, but referenced");
     }
 }
 
 void TypeChecker::visitUserType(UserType *p) {
-    // todo: add type table
+    if (newSymbolTable.contains(p->ident_)) {
+        returnValue(newSymbolTable[p->ident_]);
+    }else {
+        error("User-defined type " + p->ident_ + " is not declared");
+    }
 }
 
 void TypeChecker::visitNothingType(NothingType *p) { returnValue(new SgBaseType(EBaseType::NOTHING)); }

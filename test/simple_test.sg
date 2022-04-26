@@ -1,24 +1,31 @@
 
-declare sayHello as () -> Nothing {
+declare sayHello as Nothing -> Nothing
 
+declare fact as Integer n -> Integer {
+    if (n = 0) {
+        return 1
+    }
+
+    return n * fact(n-1)
 }
 
 declare main as String[] args -> Nothing {
-
-    x : Double {empty}
-    y <- 12.32
+    let foo: sayHello
+    let x : Double {empty}
+    let y <- 12.32
     x <- 43
-    z {x = y}
-    f <- (12 + x < 45 + y) and (12 < 13) or "abc" <= "abcd" and empty
+    let z {x = y}
+    let f <- (12 + x < 45 + y) and (12 < 13) or "abc" <= "abcd" and empty
 
     if (f) {
         for i in [1; 5] {
-            r <- i + "gello"
+            x  <- i + x
         }
     } else if (z) {
         f <- true
+        let x <- "Hello"
     } else {
-        bar <- 1212
+        let bar <- 1212
         return 12 + bar
     }
 

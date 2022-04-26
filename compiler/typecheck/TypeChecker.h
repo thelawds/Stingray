@@ -3,6 +3,7 @@
 #define COMPILER_TYPECHECKER_H
 
 #include "StingrayTypes.h"
+#include "intermediate/SymbolTable.h"
 #include "syntax/Absyn.H"
 #include <memory>
 #include <stack>
@@ -114,11 +115,12 @@ class TypeChecker : public Visitor {
       void visitListDecl(ListDecl *p) override;
       void visitListTypeReference(ListTypeReference *p) override;
       void visitListFuncParam(ListFuncParam *p) override;
+      void visitStatementAssignment(StatementAssignment *p) override;
 
-
-   private:
+    private:
     std::stack<StingrayType *> returnedTypes; // todo: mange memory correctly
-    std::unordered_map<std::string, StingrayType *> symbolTable;
+    std::unordered_map<std::string, StingrayType *> UserDefinedTypes;
+    SymbolTable<StingrayType> newSymbolTable;
 
     std::string currentFunctionName;
     SgFunctionType *currentFunctionType;

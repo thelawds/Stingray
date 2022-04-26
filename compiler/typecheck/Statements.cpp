@@ -1,7 +1,19 @@
 #include "TypeChecker.h"
 
+void TypeChecker::visitStatementAssignment(StatementAssignment *p) {
+    if (!newSymbolTable.contains(p->ident_)) {
+        error("Can not assign value to undeclared variable " + p->ident_);
+    }
+
+    auto *newType = visit(p->value_);
+    if (!newType->coercesTo(newSymbolTable[p->ident_])) {
+        error("Can not assign value of type " + newType->toString() + " to variable " + p->ident_ + " of type " +
+              newSymbolTable[p->ident_]->toString());
+    }
+}
+
 void TypeChecker::visitStatementVarDecl(StatementVarDecl *p) {
-    if (symbolTable.contains(p->ident_)) {
+    if (newSymbolTable.containsAtCurrentLayer(p->ident_)) {
         error("Error at variable definition " + p->ident_ + ". Variable already defined");
     }
 
@@ -11,35 +23,35 @@ void TypeChecker::visitStatementVarDecl(StatementVarDecl *p) {
         error("Variable can not have type NOTHING");
     }
 
-    symbolTable[p->ident_] = type;
+    newSymbolTable.putAtCurrentLayer(p->ident_, type);
 
     printType(p->ident_, type);
 }
 
 void TypeChecker::visitStatementVarDef(StatementVarDef *p) {
-    StingrayType *valueType = visit(p->value_);
-
-    if (symbolTable.contains(p->ident_)) {
-        if (!valueType->coercesTo(symbolTable[p->ident_])) {
-            error("Error at variable definition " + p->ident_ + ". Variable type and value type are not the same.");
-        }
-        printType(p->ident_, symbolTable[p->ident_]);
-    } else {
-        if (valueType->equals(new SgBaseType(EBaseType::UNTYPED))) {
-            error("Variable type should be specified, if value is empty");
-        }
-
-        symbolTable[p->ident_] = valueType;
-        printType(p->ident_, valueType);
+    if (newSymbolTable.containsAtCurrentLayer(p->ident_)) {
+        error("Error at variable definition " + p->ident_ + ". Variable already defined");
     }
+
+    StingrayType *valueType = visit(p->value_);
+    if (valueType->equals(new SgBaseType(EBaseType::UNTYPED))) {
+        error("Variable type should be specified, if value is empty");
+    }
+
+    newSymbolTable.putAtCurrentLayer(p->ident_, valueType);
+    printType(p->ident_, valueType);
 }
 
 void TypeChecker::visitStatementVarDefAsc(StatementVarDefAsc *p) {
+    if (newSymbolTable.containsAtCurrentLayer(p->ident_)) {
+        error("Error at variable definition " + p->ident_ + ". Variable already defined");
+    }
+
     StingrayType *valueType = visit(p->value_);
     StingrayType *ascType = visit(p->typereference_);
 
     if (valueType->coercesTo(ascType)) {
-        symbolTable[p->ident_] = ascType;
+        newSymbolTable.putAtCurrentLayer(p->ident_, ascType);
         printType(p->ident_, ascType);
     } else {
         error("Error at variable definition " + p->ident_ + ". Variable type and value type are not the same.");
@@ -59,7 +71,9 @@ void TypeChecker::visitIfStatement(IfStatement *p) {
         error("Expression in if statement should have type boolean, but has: " + exprType->toString());
     }
 
+    newSymbolTable.pushLayer();
     p->body__->accept(this);
+    newSymbolTable.popLayer();
 }
 
 void TypeChecker::visitIfElseIfStatement(IfElseIfStatement *p) {
@@ -69,7 +83,10 @@ void TypeChecker::visitIfElseIfStatement(IfElseIfStatement *p) {
         error("Expression in if statement should have type boolean, but has: " + exprType->toString());
     }
 
+    newSymbolTable.pushLayer();
     p->body__->accept(this);
+    newSymbolTable.popLayer();
+
     p->statementif__->accept(this);
 }
 
@@ -80,8 +97,13 @@ void TypeChecker::visitIfElseStatement(IfElseStatement *p) {
         error("Expression in if statement should have type boolean, but has: " + exprType->toString());
     }
 
+    newSymbolTable.pushLayer();
     p->body__1->accept(this);
+    newSymbolTable.popLayer();
+
+    newSymbolTable.pushLayer();
     p->body__2->accept(this);
+    newSymbolTable.popLayer();
 }
 
 void TypeChecker::visitStatementWhile(StatementWhile *p) {
@@ -91,21 +113,21 @@ void TypeChecker::visitStatementWhile(StatementWhile *p) {
         error("Expression in while statement should have type boolean, but has: " + exprType->toString());
     }
 
+    newSymbolTable.pushLayer();
     p->body__->accept(this);
+    newSymbolTable.popLayer();
 }
 
 void TypeChecker::visitStatementFor(StatementFor *p) {
-
-    if (symbolTable.contains(p->ident_) && !symbolTable[p->ident_]->equals(new SgBaseType(EBaseType::INTEGER))) {
-        error("Variable " + p->ident_ + " is already defined and is not of type Integer. The Type is " +
-              symbolTable[p->ident_]->toString());
-    }
-
-    symbolTable[p->ident_] = new SgBaseType(EBaseType::INTEGER);
+    newSymbolTable.pushLayer();
+    newSymbolTable.putAtCurrentLayer(p->ident_, new SgBaseType(EBaseType::INTEGER));
     p->body__->accept(this);
+    newSymbolTable.popLayer();
 }
 
-void TypeChecker::visitStatementReturnValue(StatementReturnValue *p) { p->expression_->accept(this); }
+void TypeChecker::visitStatementReturnValue(StatementReturnValue *p) {
+    p->expression_->accept(this); // todo make it check if the function really returns value of correct type
+}
 
 void TypeChecker::visitBody(Body *p) {
     for (auto *statement : *p->liststatement_) {
