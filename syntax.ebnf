@@ -24,7 +24,8 @@ FieldDefinition  ::= identifier [':' TypeReference] [Value] # done
 Value            ::= '<-' Expression | '{' Expression '}' # done
 Body             ::= '{' {Statement} '}' # done
 
-Statement        ::= identifier [':' TypeReference] [Value] # done
+Statement        ::= 'let' identifier [':' TypeReference] [Value] # done
+                   | identifier Value
                    | IfStatement # done
                    | 'while' Expression Body # done
                    | 'for' identifier 'in' RangeExpr Body  # done

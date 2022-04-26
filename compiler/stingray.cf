@@ -31,9 +31,10 @@ FunctionRangeMultipleNamed.     FuncRangeNamed ::= "(" [FuncParam] ")";
 separator FuncParam ",";
 
 
-StatementVarDecl.               Statement ::= Ident ":" TypeReference;
-StatementVarDef.                Statement ::= Ident Value;
-StatementVarDefAsc.             Statement ::= Ident ":" TypeReference Value;
+StatementVarDecl.               Statement ::= "let" Ident ":" TypeReference;
+StatementVarDef.                Statement ::= "let" Ident Value;
+StatementVarDefAsc.             Statement ::= "let" Ident ":" TypeReference Value;
+StatementAssignment.            Statement ::= Ident Value;
 StatementIf.                    Statement ::= StatementIf_;
 StatementWhile.                 Statement ::= "while" Expression Body_;
 StatementFor.                   Statement ::= "for" Ident "in" RangeExpr Body_;
