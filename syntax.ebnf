@@ -6,7 +6,7 @@ Import ::= 'import' identifier {'.' identifier} 'as' identifier
 Declaration ::= 'declare' identifier as TypeReference #done
 
 TypeReference ::= 'Nothing' | identifier | FunctionDeclarationType | FunctionDefinitionType #done
-               | ClassType
+               | ClassType # done
                | identifier '[]' #done
 
 FunctionDeclarationType ::= FunctionRangeDomain '->' FunctionRangeDomain #done
@@ -15,22 +15,23 @@ FunctionRangeDomain     ::= TypeReference | '(' [TypeReference {',' TypeReferenc
 NamedFunctionRange      ::= TypeReference identifier                                    #done
                          | '(' [TypeReference identifier {',' TypeReference identifier}] ')' #done
 
-ClassType        ::= [ExtendsList] ['(' StaticsBody ')'] '{' [ClassBody] '}'
-ExtendsList      ::= {identifier} (identifier | 'class' | 'interface')
-StaticsBody      ::= FieldDefinition {FieldDefinition}
-ClassBody        ::= {FieldDefinition}
+ClassType        ::= 'class' [ExtendsList] [StaticsBody] "{" [ClassBody] "}" # done
+
+ExtendsList      ::= '<' [identifier] '>'; # done
+StaticsBody      ::= '(' FieldDefinition {FieldDefinition} ')' # done
+ClassBody        ::= {FieldDefinition} # done
 
 FieldDefinition  ::= identifier [':' TypeReference] [Value] # done
 Value            ::= '<-' Expression | '{' Expression '}' # done
 Body             ::= '{' {Statement} '}' # done
 
 Statement        ::= 'let' identifier [':' TypeReference] [Value] # done
-                   | identifier Value
+                   | identifier Value # done
                    | IfStatement # done
                    | 'while' Expression Body # done
                    | 'for' identifier 'in' RangeExpr Body  # done
                    | 'return' Expression  # done
-                   | FunctionCall
+                   | FunctionCall # done
 
 IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]  #done
 

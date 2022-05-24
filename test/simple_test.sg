@@ -1,6 +1,12 @@
 
 declare sayHello as Nothing -> Nothing
 
+declare SimpleClass as class <Objective> (
+    staticVar : sayHello
+) {
+    classField : Integer <- 12
+}
+
 declare fact as Integer n -> Integer {
     if (n = 0) {
         return 1

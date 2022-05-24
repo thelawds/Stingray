@@ -117,9 +117,25 @@ class TypeChecker : public Visitor {
     void visitListTypeReference(ListTypeReference *p) override;
     void visitListFuncParam(ListFuncParam *p) override;
     void visitStatementAssignment(StatementAssignment *p) override;
-    virtual void visitFuncCall(FuncCall *p) override;
-    virtual void visitStatementFunctionCall(StatementFunctionCall *p) override;
-    virtual void visitFunctionCallExpr(FunctionCallExpr *p) override;
+    void visitFuncCall(FuncCall *p) override;
+    void visitStatementFunctionCall(StatementFunctionCall *p) override;
+    void visitFunctionCallExpr(FunctionCallExpr *p) override;
+
+    void visitExtends(Extends *p) override;
+    void visitFieldDef(FieldDef *p) override;
+    void visitStatics(Statics *p) override;
+    void visitCBody(CBody *p) override;
+    void visitClassType(ClassType *p) override;
+    void visitExtendsList(ExtendsList *p) override;
+    void visitFieldDeclaration(FieldDeclaration *p) override;
+    void visitFieldDefinition(FieldDefinition *p) override;
+    void visitFieldDefinitionAsc(FieldDefinitionAsc *p) override;
+    void visitStaticsEmpty(StaticsEmpty *p) override;
+    void visitStaticsBody(StaticsBody *p) override;
+    void visitClassBody(ClassBody *p) override;
+    void visitListIdent(ListIdent *p) override;
+    void visitListFieldDef(ListFieldDef *p) override;
+    void visitExtendsEmpty(ExtendsEmpty *p) override;
 
   private:
     std::stack<StingrayType *> returnedTypes; // todo: mange memory correctly

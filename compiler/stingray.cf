@@ -6,7 +6,6 @@ terminator Decl "";
 
 Declaration.                    Decl ::= "declare" Ident "as" TypeReference;
 
-UserType.                       TypeReference ::= Ident;
 NothingType.                    TypeReference ::= "Nothing";
 BoolType.                       TypeReference ::= "Boolean";
 IntegerType.                    TypeReference ::= "Integer";
@@ -15,6 +14,23 @@ StringType.                     TypeReference ::= "String";
 FunctionDeclType.               TypeReference ::= FuncDecl;
 FunctionDefType.                TypeReference ::= FuncDefn;
 ArrayType.                      TypeReference ::= TypeReference "[]";
+ClassType.                      TypeReference ::= "class" Extends Statics "{" CBody "}";
+UserType.                       TypeReference ::= Ident;
+
+ExtendsEmpty.                   Extends ::= ;
+ExtendsList.                    Extends ::= "<" [Ident] ">";
+separator Ident ",";
+
+FieldDeclaration.               FieldDef ::= Ident ":" TypeReference;
+FieldDefinition.                FieldDef ::= Ident Value;
+FieldDefinitionAsc.             FieldDef ::= Ident ":" TypeReference Value;
+
+StaticsEmpty.                   Statics ::= ;
+StaticsBody.                    Statics ::= "(" [FieldDef] ")";
+terminator FieldDef "";
+
+ClassBody.                      CBody ::= [FieldDef];
+terminator FieldDef "";
 
 FunctionDeclaration.            FuncDecl ::= FuncRange "->" FuncDomain;
 FunctionDefinition.             FuncDefn ::= FuncRangeNamed "->" FuncDomain Body_;
@@ -29,7 +45,6 @@ FunctionParameter.              FuncParam ::= TypeReference Ident;
 FunctionRangeSingleNamed.       FuncRangeNamed ::= FuncParam;
 FunctionRangeMultipleNamed.     FuncRangeNamed ::= "(" [FuncParam] ")";
 separator FuncParam ",";
-
 
 StatementVarDecl.               Statement ::= "let" Ident ":" TypeReference;
 StatementVarDef.                Statement ::= "let" Ident Value;

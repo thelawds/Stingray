@@ -420,10 +420,6 @@ void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {
     returnValue(dynamic_cast<SgArrayType *>(lhsType)->parentType);
 }
 
-void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {
-    // todo: implement after classes
-}
-
 void TypeChecker::visitFunctionCallExpr(FunctionCallExpr *p) { returnValue(visit(p->funccall_)); }
 
 void TypeChecker::visitFunctionCall(FunctionCall *p) {
@@ -456,6 +452,10 @@ void TypeChecker::visitFunctionCall(FunctionCall *p) {
     } else {
         error("Unable to apply call operator to variable of type " + refType->toString(), p);
     }
+}
+
+void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {
+    // todo: implement after classes
 }
 
 void TypeChecker::visitMethodReference(MethodReference *p) {
