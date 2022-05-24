@@ -1,7 +1,11 @@
 #include "TypeChecker.h"
 #include <iostream>
 
-TypeChecker::~TypeChecker() = default;
+TypeChecker::~TypeChecker() {
+    delete NOTHING_TYPE;
+    delete printer;
+    // todo
+}
 
 void TypeChecker::visitProgram_(Program_ *p) { p->accept(this); }
 
@@ -25,11 +29,11 @@ StingrayType *TypeChecker::visit(Visitable *v) {
     return stackPop();
 }
 
-void TypeChecker::error(const std::string &error) {
-    std::cerr << error << std::endl;
+void TypeChecker::error(const std::string &error, Visitable *tree) {
+    std::cerr << error << "\nError Position:\n" << printer->print(tree) << std::endl;
     exit(1);
 }
+
 void TypeChecker::printType(const std::string &variableName, const StingrayType *type) {
     std::cout << "Variable " << variableName << " is of type " << type->toString() << std::endl;
 }
-

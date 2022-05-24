@@ -2,9 +2,10 @@
 #ifndef COMPILER_TYPECHECKER_H
 #define COMPILER_TYPECHECKER_H
 
-#include "StingrayTypes.h"
-#include "intermediate/SymbolTable.h"
+#include "intermediate/StingrayTypes.h"
+#include "intermediate/LayeredTable.h"
 #include "syntax/Absyn.H"
+#include "syntax/Printer.H"
 #include <memory>
 #include <stack>
 #include <unordered_map>
@@ -70,67 +71,70 @@ class TypeChecker : public Visitor {
     void visitValueArrowed(ValueArrowed *p) override;
     void visitValueBraced(ValueBraced *p) override;
 
-     void visitProgram_(Program_ *p) override;
-     void visitTypeReference(TypeReference *p) override;
-     void visitStatement(Statement *p) override;
-     void visitValue(Value *p) override;
-     void visitListStatement(ListStatement *p) override;
-     void visitInteger(Integer x) override;
-     void visitChar(Char x) override;
-     void visitDouble(Double x) override;
-     void visitString(String x) override;
-     void visitIdent(Ident x) override;
-     void visitStatementIf_(StatementIf_ *p) override;
-     void visitBody_(Body_ *p) override;
-     void visitRangeExpr(RangeExpr *p) override;
-     void visitStatementIf(StatementIf *p) override;
-     void visitStatementWhile(StatementWhile *p) override;
-     void visitStatementFor(StatementFor *p) override;
-     void visitStatementReturnNone(StatementReturnNone *p) override;
-     void visitStatementReturnValue(StatementReturnValue *p) override;
-     void visitIfStatement(IfStatement *p) override;
-     void visitIfElseIfStatement(IfElseIfStatement *p) override;
-     void visitIfElseStatement(IfElseStatement *p) override;
-     void visitBody(Body *p) override;
-     void visitRangeExpressionTerm(RangeExpressionTerm *p) override;
-      void visitDecl(Decl *p) override;
-      void visitFuncDecl(FuncDecl *p) override;
-      void visitFuncDefn(FuncDefn *p) override;
-      void visitFuncDomain(FuncDomain *p) override;
-      void visitFuncRange(FuncRange *p) override;
-      void visitFuncParam(FuncParam *p) override;
-      void visitFuncRangeNamed(FuncRangeNamed *p) override;
-      void visitDeclaration(Declaration *p) override;
-      void visitFunctionDeclType(FunctionDeclType *p) override;
-      void visitFunctionDefType(FunctionDefType *p) override;
-      void visitArrayType(ArrayType *p) override;
-      void visitFunctionDeclaration(FunctionDeclaration *p) override;
-      void visitFunctionDefinition(FunctionDefinition *p) override;
-      void visitFunctionDomain(FunctionDomain *p) override;
-      void visitFunctionRangeSingle(FunctionRangeSingle *p) override;
-      void visitFunctionRangeMultiple(FunctionRangeMultiple *p) override;
-      void visitFunctionParameter(FunctionParameter *p) override;
-      void visitFunctionRangeSingleNamed(FunctionRangeSingleNamed *p) override;
-      void visitFunctionRangeMultipleNamed(FunctionRangeMultipleNamed *p) override;
-      void visitListDecl(ListDecl *p) override;
-      void visitListTypeReference(ListTypeReference *p) override;
-      void visitListFuncParam(ListFuncParam *p) override;
-      void visitStatementAssignment(StatementAssignment *p) override;
+    void visitProgram_(Program_ *p) override;
+    void visitTypeReference(TypeReference *p) override;
+    void visitStatement(Statement *p) override;
+    void visitValue(Value *p) override;
+    void visitListStatement(ListStatement *p) override;
+    void visitInteger(Integer x) override;
+    void visitChar(Char x) override;
+    void visitDouble(Double x) override;
+    void visitString(String x) override;
+    void visitIdent(Ident x) override;
+    void visitStatementIf_(StatementIf_ *p) override;
+    void visitBody_(Body_ *p) override;
+    void visitRangeExpr(RangeExpr *p) override;
+    void visitStatementIf(StatementIf *p) override;
+    void visitStatementWhile(StatementWhile *p) override;
+    void visitStatementFor(StatementFor *p) override;
+    void visitStatementReturnNone(StatementReturnNone *p) override;
+    void visitStatementReturnValue(StatementReturnValue *p) override;
+    void visitIfStatement(IfStatement *p) override;
+    void visitIfElseIfStatement(IfElseIfStatement *p) override;
+    void visitIfElseStatement(IfElseStatement *p) override;
+    void visitBody(Body *p) override;
+    void visitRangeExpressionTerm(RangeExpressionTerm *p) override;
+    void visitDecl(Decl *p) override;
+    void visitFuncDecl(FuncDecl *p) override;
+    void visitFuncDefn(FuncDefn *p) override;
+    void visitFuncDomain(FuncDomain *p) override;
+    void visitFuncRange(FuncRange *p) override;
+    void visitFuncParam(FuncParam *p) override;
+    void visitFuncRangeNamed(FuncRangeNamed *p) override;
+    void visitDeclaration(Declaration *p) override;
+    void visitFunctionDeclType(FunctionDeclType *p) override;
+    void visitFunctionDefType(FunctionDefType *p) override;
+    void visitArrayType(ArrayType *p) override;
+    void visitFunctionDeclaration(FunctionDeclaration *p) override;
+    void visitFunctionDefinition(FunctionDefinition *p) override;
+    void visitFunctionDomain(FunctionDomain *p) override;
+    void visitFunctionRangeSingle(FunctionRangeSingle *p) override;
+    void visitFunctionRangeMultiple(FunctionRangeMultiple *p) override;
+    void visitFunctionParameter(FunctionParameter *p) override;
+    void visitFunctionRangeSingleNamed(FunctionRangeSingleNamed *p) override;
+    void visitFunctionRangeMultipleNamed(FunctionRangeMultipleNamed *p) override;
+    void visitListDecl(ListDecl *p) override;
+    void visitListTypeReference(ListTypeReference *p) override;
+    void visitListFuncParam(ListFuncParam *p) override;
+    void visitStatementAssignment(StatementAssignment *p) override;
 
-    private:
+  private:
     std::stack<StingrayType *> returnedTypes; // todo: mange memory correctly
     std::unordered_map<std::string, StingrayType *> UserDefinedTypes;
-    SymbolTable<StingrayType> newSymbolTable;
+    LayeredTable<StingrayType> symbolTable;
 
     std::string currentFunctionName;
     SgFunctionType *currentFunctionType;
+
+    SgBaseType* NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
+    PrintAbsyn *printer = new PrintAbsyn();
 
     StingrayType *stackPop();
     void returnValue(StingrayType *);
     void returnValue(EBaseType);
     StingrayType *visit(Visitable *);
 
-    static void error(const std::string &);                           // todo: provide better errors
+    void error(const std::string &, Visitable *);              // todo: provide better errors
     static void printType(const std::string &, const StingrayType *); // todo: use only for debug
 };
 

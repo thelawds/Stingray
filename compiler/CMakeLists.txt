@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 FIND_PACKAGE(BISON REQUIRED)
 FIND_PACKAGE(FLEX REQUIRED)
+find_package(LLVM REQUIRED CONFIG)
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
 
 BISON_TARGET(
         PARSER
@@ -34,7 +37,7 @@ set(
         syntax/Skeleton.C
         syntax/Skeleton.H
         syntax/ParserError.H
-)
+        )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} syntax/)
 
@@ -44,7 +47,21 @@ add_executable(
         ${BNFC_SOURCES}
         ${FLEX_SCANNER_OUTPUTS}
         ${BISON_PARSER_OUTPUTS}
-        typecheck/TypeChecker.cpp typecheck/TypeChecker.h typecheck/BaseTypes.cpp typecheck/StingrayTypes.cpp typecheck/StingrayTypes.h typecheck/Expressions.cpp typecheck/Statements.cpp typecheck/Unused.cpp typecheck/TopLevelDeclarations.cpp intermediate/SymbolTable.h
+        typecheck/TypeChecker.cpp
+        typecheck/TypeChecker.h
+        typecheck/BaseTypes.cpp
+        intermediate/StingrayTypes.cpp
+        intermediate/StingrayTypes.h
+        typecheck/Expressions.cpp
+        typecheck/Statements.cpp
+        typecheck/Unused.cpp
+        typecheck/TopLevelDeclarations.cpp
+        intermediate/LayeredTable.h
+        interpretation/InterpretationVisitor.h
+        interpretation/InterpretationVisitor.cpp
+        interpretation/Expressions.cpp
+        interpretation/Statements.cpp
+        interpretation/TopLevelDeclarations.cpp
 )
 
 target_include_directories(compiler PRIVATE ${CMAKE_SOURCE_DIR})

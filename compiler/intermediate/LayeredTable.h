@@ -1,12 +1,12 @@
 
-#ifndef COMPILER_SYMBOLTABLE_H
-#define COMPILER_SYMBOLTABLE_H
+#ifndef COMPILER_LAYEREDTABLE_H
+#define COMPILER_LAYEREDTABLE_H
 
 #include <deque>
 #include <string>
 #include <unordered_map>
 
-template <typename T> class SymbolTable {
+template <typename T> class LayeredTable {
   public:
     inline void pushLayer() { symbols.push_front(std::unordered_map<std::string, T *>()); }
 
@@ -50,4 +50,4 @@ template <typename T> class SymbolTable {
     std::deque<std::unordered_map<std::string, T *>> symbols;
 };
 
-#endif // COMPILER_SYMBOLTABLE_H
+#endif // COMPILER_LAYEREDTABLE_H

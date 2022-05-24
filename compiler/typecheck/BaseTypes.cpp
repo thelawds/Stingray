@@ -14,18 +14,18 @@ void TypeChecker::visitIntegerTerm(IntegerTerm *p) { returnValue(new SgBaseType(
 void TypeChecker::visitDoubleTerm(DoubleTerm *p) { returnValue(new SgBaseType(EBaseType::DOUBLE)); }
 
 void TypeChecker::visitVariableReferenceTerm(VariableReferenceTerm *p) {
-    if (newSymbolTable.contains(p->ident_)) {
-        returnValue(newSymbolTable[p->ident_]);
+    if (symbolTable.contains(p->ident_)) {
+        returnValue(symbolTable[p->ident_]);
     } else {
-        error("Variable " + p->ident_ + " is not declared, but referenced");
+        error("Variable " + p->ident_ + " is not declared, but referenced", p);
     }
 }
 
 void TypeChecker::visitUserType(UserType *p) {
-    if (newSymbolTable.contains(p->ident_)) {
-        returnValue(newSymbolTable[p->ident_]);
+    if (symbolTable.contains(p->ident_)) {
+        returnValue(symbolTable[p->ident_]);
     }else {
-        error("User-defined type " + p->ident_ + " is not declared");
+        error("User-defined type " + p->ident_ + " is not declared", p);
     }
 }
 

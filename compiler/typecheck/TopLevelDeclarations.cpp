@@ -1,21 +1,22 @@
 #include "TypeChecker.h"
 
 void TypeChecker::visitDeclaration(Declaration *p) {
-    if (dynamic_cast<FunctionDefType *>(p->typereference_)) {
+    if (dynamic_cast<FunctionDefType *>(p->typereference_) || dynamic_cast<FunctionDeclType *>(p->typereference_)) {
         currentFunctionName = p->ident_;
     }
 
-    if (newSymbolTable.contains(p->ident_)) {
-        auto *existingType = newSymbolTable[p->ident_];
+    if (symbolTable.contains(p->ident_)) {
+        auto *existingType = symbolTable[p->ident_];
         auto *type = visit(p->typereference_);
 
         if (!type->coercesTo(existingType)) {
             error("Redeclaration of " + p->ident_ + " failed. Expected type to be convertible to " +
-                  newSymbolTable[p->ident_]->toString() + " but got: " + type->toString());
+                      symbolTable[p->ident_]->toString() + " but got: " + type->toString(),
+                  p);
         }
     } else {
         auto *type = visit(p->typereference_);
-        newSymbolTable.putAtCurrentLayer(p->ident_, type);
+        symbolTable.putAtCurrentLayer(p->ident_, type);
     }
 
     currentFunctionType = nullptr;
@@ -37,19 +38,19 @@ void TypeChecker::visitFunctionDefinition(FunctionDefinition *p) {
     auto *range = p->funcrangenamed_;
     auto *domain = p->funcdomain_;
 
-    newSymbolTable.pushLayer();
-    newSymbolTable.putAtCurrentLayer(currentFunctionName, nullptr);
+    symbolTable.pushLayer();
+    symbolTable.putAtCurrentLayer(currentFunctionName, nullptr);
 
     currentFunctionType = new SgFunctionType({}, visit(domain));
     range->accept(this);
 
-    newSymbolTable[currentFunctionName] = currentFunctionType;
+    symbolTable[currentFunctionName] = currentFunctionType;
     returnValue(currentFunctionType);
 
     printType(currentFunctionName, currentFunctionType);
 
     p->body__->accept(this);
-    newSymbolTable.popLayer();
+    symbolTable.popLayer();
 }
 
 void TypeChecker::visitFunctionDomain(FunctionDomain *p) { returnValue(visit(p->typereference_)); }
@@ -57,7 +58,7 @@ void TypeChecker::visitFunctionDomain(FunctionDomain *p) { returnValue(visit(p->
 void TypeChecker::visitFunctionRangeSingle(FunctionRangeSingle *p) {
     auto *type = visit(p->typereference_);
 
-    if (!type->equals(new SgBaseType(EBaseType::NOTHING))) { // todo
+    if (!type->equals(NOTHING_TYPE)) {
         currentFunctionType->addRangeType(type);
     }
 }
@@ -70,12 +71,12 @@ void TypeChecker::visitFunctionRangeMultiple(FunctionRangeMultiple *p) {
 }
 
 void TypeChecker::visitFunctionParameter(FunctionParameter *p) {
-    if (newSymbolTable.containsAtCurrentLayer(p->ident_)) {
-        error("Error in function declaration: variable " + p->ident_ + " is already defined");
+    if (symbolTable.containsAtCurrentLayer(p->ident_)) {
+        error("Error in function declaration: variable " + p->ident_ + " is already defined", p);
     }
 
     auto *type = visit(p->typereference_);
-    newSymbolTable.putAtCurrentLayer(p->ident_, type);
+    symbolTable.putAtCurrentLayer(p->ident_, type);
     printType(p->ident_, type);
     returnValue(type);
 }

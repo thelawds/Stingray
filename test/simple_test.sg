@@ -10,7 +10,7 @@ declare fact as Integer n -> Integer {
 }
 
 declare main as String[] args -> Nothing {
-    let foo: sayHello
+    let foo: sayHello 
     let x : Double {empty}
     let y <- 12.32
     x <- 43
