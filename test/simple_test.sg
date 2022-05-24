@@ -17,6 +17,9 @@ declare main as String[] args -> Nothing {
     let z {x = y}
     let f <- (12 + x < 45 + y) and (12 < 13) or "abc" <= "abcd" and empty
     let arr <- [12, true, 33.3]
+    let arrElem <- arr[5]
+
+    fact(arr)
 
     if (f) {
         for i in [1; 5] {

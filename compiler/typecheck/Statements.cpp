@@ -134,6 +134,8 @@ void TypeChecker::visitStatementReturnValue(StatementReturnValue *p) {
     }
 }
 
+void TypeChecker::visitStatementFunctionCall(StatementFunctionCall *p) { visit(p->funccall_); }
+
 void TypeChecker::visitBody(Body *p) {
     for (auto *statement : *p->liststatement_) {
         statement->accept(this);

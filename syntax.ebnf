@@ -30,6 +30,7 @@ Statement        ::= 'let' identifier [':' TypeReference] [Value] # done
                    | 'while' Expression Body # done
                    | 'for' identifier 'in' RangeExpr Body  # done
                    | 'return' Expression  # done
+                   | FunctionCall
 
 IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]  #done
 

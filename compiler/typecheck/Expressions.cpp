@@ -43,7 +43,8 @@ void TypeChecker::visitRelationalLess(RelationalLess *p) {
         }
 
         error("Unexpected types for relational < operator. Expected both numerical or string, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for relational < should be base", p);
@@ -71,7 +72,8 @@ void TypeChecker::visitRelationalGreater(RelationalGreater *p) {
         }
 
         error("Unexpected types for relational > operator. Expected both numerical or string, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for relational > should be base", p);
@@ -99,7 +101,8 @@ void TypeChecker::visitRelationalLessOrEqual(RelationalLessOrEqual *p) {
         }
 
         error("Unexpected types for relational <= operator. Expected both numerical or string, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for relational <= should be base", p);
@@ -127,7 +130,8 @@ void TypeChecker::visitRelationalGreaterOrEqual(RelationalGreaterOrEqual *p) {
         }
 
         error("Unexpected types for relational >= operator. Expected both numerical or string, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for relational >= should be base", p);
@@ -155,8 +159,9 @@ void TypeChecker::visitArithmeticSum(ArithmeticSum *p) {
             return;
         }
 
-        auto *stringType = new SgBaseType(EBaseType::STRING);// todo delete
-        if ((lhsType->equals(stringType) || rhsType->equals(stringType)) && lhsType->coercesTo(stringType) && // todo: optimize
+        auto *stringType = new SgBaseType(EBaseType::STRING); // todo delete
+        if ((lhsType->equals(stringType) || rhsType->equals(stringType)) &&
+            lhsType->coercesTo(stringType) && // todo: optimize
             rhsType->coercesTo(stringType)) {
 
             returnValue(EBaseType::STRING);
@@ -164,7 +169,8 @@ void TypeChecker::visitArithmeticSum(ArithmeticSum *p) {
         }
 
         error("Unexpected types for arithmetic + operator. Expected both numerical or string, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for arithmetic + should be base", p);
@@ -193,7 +199,8 @@ void TypeChecker::visitArithmeticDifference(ArithmeticDifference *p) {
         }
 
         error("Unexpected types for arithmetic - operator. Expected both numerical, but got: " + lhsType->toString() +
-              " and " + rhsType->toString(), p);
+                  " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for arithmetic - should be base", p);
@@ -222,7 +229,8 @@ void TypeChecker::visitArithmeticProduct(ArithmeticProduct *p) {
         }
 
         error("Unexpected types for arithmetic * operator. Expected both numerical, but got: " + lhsType->toString() +
-              " and " + rhsType->toString(), p);
+                  " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for arithmetic * should be base", p);
@@ -251,7 +259,8 @@ void TypeChecker::visitArithmeticQuotient(ArithmeticQuotient *p) {
         }
 
         error("Unexpected types for arithmetic / operator. Expected both numerical, but got: " + lhsType->toString() +
-              " and " + rhsType->toString(), p);
+                  " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for arithmetic / should be base", p);
@@ -284,7 +293,8 @@ void TypeChecker::visitArithmeticExponentiation(ArithmeticExponentiation *p) {
         }
 
         error("Unexpected types for arithmetic ^ operator. Expected both numerical but got: " + lhsType->toString() +
-              " and " + rhsType->toString(), p);
+                  " and " + rhsType->toString(),
+              p);
 
     } else {
         error("Types for arithmetic ^ should be base", p);
@@ -304,7 +314,8 @@ void TypeChecker::visitLogicalConjunction(LogicalConjunction *p) {
         returnValue(EBaseType::BOOLEAN);
     } else {
         error("Expected both types of logical and to be of type convertible to boolean, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
     }
 }
 
@@ -317,7 +328,8 @@ void TypeChecker::visitLogicalDisjunction(LogicalDisjunction *p) {
         returnValue(EBaseType::BOOLEAN);
     } else {
         error("Expected both types of logical and to be of type convertible to boolean, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
     }
 }
 
@@ -330,7 +342,8 @@ void TypeChecker::visitLogicalExclusiveDisjunction(LogicalExclusiveDisjunction *
         returnValue(EBaseType::BOOLEAN);
     } else {
         error("Expected both types of logical and to be of type convertible to boolean, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
     }
 }
 
@@ -343,7 +356,8 @@ void TypeChecker::visitLogicalImplication(LogicalImplication *p) {
         returnValue(EBaseType::BOOLEAN);
     } else {
         error("Expected both types of logical and to be of type convertible to boolean, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
     }
 }
 
@@ -356,7 +370,8 @@ void TypeChecker::visitLogicalEquivalence(LogicalEquivalence *p) {
         returnValue(EBaseType::BOOLEAN);
     } else {
         error("Expected both types of logical and to be of type convertible to boolean, but got: " +
-              lhsType->toString() + " and " + rhsType->toString(), p);
+                  lhsType->toString() + " and " + rhsType->toString(),
+              p);
     }
 }
 
@@ -391,20 +406,58 @@ void TypeChecker::visitArrayInitializer(ArrayInitializer *p) {
     }
 }
 
-void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {}
+void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {
+    auto *lhsType = visit(p->expression_1);
+    if (lhsType->typeCategory != TypeCategory::ARRAY) {
+        error("Can not apply [] to the variable of type " + lhsType->toString() + ". Expected array.", p);
+    }
 
-void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {}
+    auto *rhsType = visit(p->expression_2);
+    if (!rhsType->coercesTo(INTEGER_TYPE)) {
+        error("Can not apply [] with index of type " + rhsType->toString() + ". Expected Integer.", p);
+    }
+
+    returnValue(dynamic_cast<SgArrayType *>(lhsType)->parentType);
+}
+
+void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {
+    // todo: implement after classes
+}
+
+void TypeChecker::visitFunctionCallExpr(FunctionCallExpr *p) { returnValue(visit(p->funccall_)); }
 
 void TypeChecker::visitFunctionCall(FunctionCall *p) {
-    auto*refType = visit(p->expression_);
+    auto *refType = visit(p->expression_);
 
     if (refType->typeCategory == TypeCategory::FUNCTION) {
         // todo: check parameters
         auto *funcType = dynamic_cast<SgFunctionType *>(refType);
+
+        if (funcType->range.size() != p->listexpression_->size()) {
+            error("Can not call function. Size of formal parameters differs from actual given: expected " +
+                      std::to_string(funcType->range.size()) +
+                      ", but given: " + std::to_string(p->listexpression_->size()),
+                  p);
+        }
+
+        for (size_t i = 0; i < funcType->range.size(); ++i) {
+            auto *paramType = funcType->range[i];
+            auto *argumentType = visit((*p->listexpression_)[i]);
+
+            if (!argumentType->coercesTo(paramType)) {
+                error("Can not call function. Parameter at position " + std::to_string(i) +
+                          " differs in type from given argument. Expected " + paramType->toString() +
+                          ", but given: " + argumentType->toString(),
+                      p);
+            }
+        }
+
         returnValue(funcType->domain);
     } else {
-        error("Unable to apply call operator to variable of type " + refType->toString(),  p);
+        error("Unable to apply call operator to variable of type " + refType->toString(), p);
     }
 }
 
-void TypeChecker::visitMethodReference(MethodReference *p) {}
+void TypeChecker::visitMethodReference(MethodReference *p) {
+    // todo: implement after classes
+}

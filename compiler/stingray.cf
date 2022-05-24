@@ -40,6 +40,7 @@ StatementWhile.                 Statement ::= "while" Expression Body_;
 StatementFor.                   Statement ::= "for" Ident "in" RangeExpr Body_;
 StatementReturnNone.            Statement ::= "return";
 StatementReturnValue.           Statement ::= "return" Expression;
+StatementFunctionCall.          Statement ::= FuncCall;
 
 IfStatement.                    StatementIf_ ::= "if" Expression Body_;
 IfElseIfStatement.              StatementIf_ ::= "if" Expression Body_ "else" StatementIf_;
@@ -93,7 +94,9 @@ VariableReferenceTerm.          Expression10 ::= Ident;
 ArrayReferenceTerm.             Expression10 ::= Expression10 "[" Expression "]";
 FieldReferenceTerm.             Expression10 ::= Expression10 "." Ident;
 
-FunctionCall.                   Expression10 ::= Expression10 "(" [Expression] ")";
+FunctionCallExpr.               Expression10 ::= FuncCall;
+FunctionCall.                   FuncCall     ::= Expression10 "(" [Expression] ")";      
+
 separator Expression ",";
 
 ArrayInitializer.               Expression10 ::= "[" [Expression] "]";

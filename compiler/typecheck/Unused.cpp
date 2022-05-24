@@ -25,7 +25,7 @@ void TypeChecker::visitFuncRangeNamed(FuncRangeNamed *p) {}
 void TypeChecker::visitListDecl(ListDecl *p) {}
 void TypeChecker::visitListTypeReference(ListTypeReference *p) {}
 void TypeChecker::visitListFuncParam(ListFuncParam *p) {}
-
+void TypeChecker::visitFuncCall(FuncCall *p) {}
 /**
  * Ranges are not type-checked
  */

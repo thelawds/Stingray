@@ -117,6 +117,9 @@ class TypeChecker : public Visitor {
     void visitListTypeReference(ListTypeReference *p) override;
     void visitListFuncParam(ListFuncParam *p) override;
     void visitStatementAssignment(StatementAssignment *p) override;
+    virtual void visitFuncCall(FuncCall *p) override;
+    virtual void visitStatementFunctionCall(StatementFunctionCall *p) override;
+    virtual void visitFunctionCallExpr(FunctionCallExpr *p) override;
 
   private:
     std::stack<StingrayType *> returnedTypes; // todo: mange memory correctly
@@ -127,6 +130,8 @@ class TypeChecker : public Visitor {
     SgFunctionType *currentFunctionType;
 
     SgBaseType* NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
+    SgBaseType *INTEGER_TYPE = new SgBaseType(EBaseType::INTEGER);
+
     PrintAbsyn *printer = new PrintAbsyn();
 
     StingrayType *stackPop();
