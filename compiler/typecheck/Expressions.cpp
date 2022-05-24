@@ -258,7 +258,9 @@ void TypeChecker::visitArithmeticQuotient(ArithmeticQuotient *p) {
     }
 }
 
-void TypeChecker::visitArithmeticModulus(ArithmeticModulus *p) {}
+void TypeChecker::visitArithmeticModulus(ArithmeticModulus *p) {
+    // todo
+}
 
 void TypeChecker::visitArithmeticExponentiation(ArithmeticExponentiation *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
@@ -289,7 +291,9 @@ void TypeChecker::visitArithmeticExponentiation(ArithmeticExponentiation *p) {
     }
 }
 
-void TypeChecker::visitLogicalUnaryNot(LogicalUnaryNot *p) {}
+void TypeChecker::visitLogicalUnaryNot(LogicalUnaryNot *p) {
+    // todo
+}
 
 void TypeChecker::visitLogicalConjunction(LogicalConjunction *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
@@ -360,10 +364,35 @@ void TypeChecker::visitUnaryHashCode(UnaryHashCode *p) {
     // todo: not implemented
 }
 
-void TypeChecker::visitUnaryMinus(UnaryMinus *p) {}
-void TypeChecker::visitRangeExpr(RangeExpr *p) {}
-void TypeChecker::visitRangeExpressionTerm(RangeExpressionTerm *p) {}
+void TypeChecker::visitUnaryMinus(UnaryMinus *p) {
+    // todo
+}
+
+void TypeChecker::visitArrayInitializer(ArrayInitializer *p) {
+    StingrayType *arrayElementType{nullptr};
+
+    for (auto *expr : *p->listexpression_) {
+        auto *exprType = visit(expr);
+
+        if (arrayElementType) {
+            if (exprType->coercesTo(arrayElementType)) {
+                // skip
+            } else if (arrayElementType->coercesTo(exprType)) {
+                arrayElementType = exprType;
+            } else {
+                error("All elements in array should have the same type", p);
+            }
+
+        } else {
+            arrayElementType = exprType;
+        }
+
+        returnValue(new SgArrayType(arrayElementType));
+    }
+}
+
 void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {}
+
 void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {}
 
 void TypeChecker::visitFunctionCall(FunctionCall *p) {
@@ -378,12 +407,4 @@ void TypeChecker::visitFunctionCall(FunctionCall *p) {
     }
 }
 
-void TypeChecker::visitArrayInitializer(ArrayInitializer *p) {}
-void TypeChecker::visitRangeExpression(RangeExpression *p) {}
-void TypeChecker::visitSteppedRangeExpression(SteppedRangeExpression *p) {}
-void TypeChecker::visitOpenRange(OpenRange *p) {}
-void TypeChecker::visitClosedRange(ClosedRange *p) {}
-void TypeChecker::visitLeftClosedRightOpenedRange(LeftClosedRightOpenedRange *p) {}
-void TypeChecker::visitLeftOpenedRightClosedRange(LeftOpenedRightClosedRange *p) {}
-void TypeChecker::visitRangeBody(RangeBody *p) {}
 void TypeChecker::visitMethodReference(MethodReference *p) {}
