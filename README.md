@@ -8,22 +8,12 @@ Stingray is object-oriented, functional general purpose programming language sup
 
 Stingray source files have the extension of `.stingray` or `.sg`
 
-# Stages:
-- [ ] Expressions, Function Declarations, Type Ascription
-- [ ] Control-Flow, Function Calls
-- [ ] Class Declarations, Inheritance
-- [ ] Arrays, Imports System
-- [ ] Type Inference
 
 ## Basic Types:
 Stingray allows for some of the following basic types:
 - Integer (i32)
-- Long    (i64)
-- Float   (f32)
 - Double  (f64)
-- Boolean (i1)
-- Char    (i8)
-- String  (i8[]) ?
+- String  (i8[])
 - Nothing
 
 ## Program Structure
@@ -61,22 +51,15 @@ NamedFunctionRange      ::= TypeReference identifier | '(' [TypeReference identi
 Class declarations in Stingray have the following syntax:
 
 ```java
-ClassType        ::= [ExtendsList] ['(' StaticsBody ')'] '{' [ClassBody] '}'
-ExtendsList      ::= {identifier} (identifier | 'class' | 'interface')
-StaticsBody      ::= FieldDefinition {FieldDefinition}
+ClassType        ::= 'class' [ExtendsList] [StaticsBody] "{" [ClassBody] "}" 
+ExtendsList      ::= '<' [identifier] '>';
+StaticsBody      ::= '(' FieldDefinition {FieldDefinition} ')'
 ClassBody        ::= {FieldDefinition}
 
 FieldDefinition  ::= identifier [':' TypeReference] [Value]
 Value            ::= '<-' Expression | '{' Expression '}'
 Body             ::= '{' {Statement} '}'
 ```
-
-There are special types of Functions in Stingray called Constructors. Syntactically, for class `T` they are defined as:
-```java
-Constructor ::= 'new' ':' NamedFunctionRange '->' 'T' '{' {Statement} 'return' 'this' '}'
-```
-
-If there is no constructors in the class, then default constructor created, which initializes all the fields in the class with value of `empty`
 
 ## Function Bodies
 ### Statements
@@ -87,15 +70,16 @@ Statement        ::= identifier [':' TypeReference] [Value]
                    | 'while' Expression Body
                    | 'for' identifier 'in' RangeExpr Body
                    | 'return' Expression
+                   | FunctionCall
 
 IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]
+FunctionCall    ::= Term '(' [Expression {',' Expression}] ')'
 ```
 
 ### Expressions
 
 ```java
-LambdaExpr   ::= NamedFunctionRange '->' (Expression | Body) 
-                   | '(' [identifier {',' identifier}] ')' -> (Expression | Body)
+LambdaExpr   ::= '(' {identifier} ')' Body
 
 MethodRef    ::= identifier '::' identifier
 
@@ -105,14 +89,14 @@ ArrayRef     ::= Term '[' Expression ']'
 FunctionCall ::= Term '(' [Expression {',' Expression}] ')'
 FieldRef     ::= Term '.' identifier
 
-Term         ::= '(' Expression ')'
-               | [Unop] Term
-               | ArrayRef
-               | FunctionCall
-               | FieldRef
-               | ('true' | 'false' | 'empty')
-               | '[' [Expression {',' Expression}] ']'
-               | RangeExpr
+Term         ::= '(' Expression ')'  
+               | ArrayRef 
+               | FunctionCall  
+               | FieldRef  
+               | ('true' | 'false' | 'empty') 
+               | (numeric | string | identifier) 
+               | '[' [Expression {',' Expression}] ']' 
+               | RangeExpr  
 
 RangeOpening    ::= '[' | '('
 RangeClosing    ::= ']' | ')'
@@ -138,24 +122,24 @@ Semantics for operators `=>` and `<=>`:
 
 # Operational Semantics, Typing Rules and Type Conversions:
 ## Arithmetic and Relational Expressions:
-If arguments in arithmetic expression have different types, then one is converted to another: from smallest to largest. E. g. `Char -> Integer -> Long -> Float -> Double` and then typing rules are applied.
+If arguments in arithmetic expression have different types, then one is converted to another: from smallest to largest. E. g. `Integer -> Double` and then typing rules are applied.
 
 Arithmetic:
 - Any Integer literal has type `Integer`. Any Floating-Point literal has type `Double`.
-- if `a:T, b:T` then `(a + b): T`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a - b): T`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a * b): T`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a / b): T`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a % b): T`, where `T in {Char, Integer, Long}`
-- if `a:T, b:T` then `(a ^ b): T`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a + b): T`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a - b): T`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a * b): T`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a / b): T`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a % b): T`, where `T in {Integer}`
+- if `a:T, b:T` then `(a ^ b): T`, where `T in {Integer, Double}`
 
 Relational:
-- if `a:T, b:T` then `(a <  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a <= b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a >  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a >= b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a =  b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
-- if `a:T, b:T` then `(a != b): Boolean`, where `T in {Char, Integer, Long, Float, Double}`
+- if `a:T, b:T` then `(a <  b): Boolean`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a <= b): Boolean`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a >  b): Boolean`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a >= b): Boolean`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a =  b): Boolean`, where `T in {Integer, Double}`
+- if `a:T, b:T` then `(a != b): Boolean`, where `T in {Integer, Double}`
 
 ## Logical Expressions:
 If any of the arguments have numeric type - `Char, Integer, Long, Float, Double`, then it is converted to `Boolean` using the following rule:
@@ -171,123 +155,59 @@ If any of the arguments have numeric type - `Char, Integer, Long, Float, Double`
 
 # Program Example
 ```java
-import system.io.readInt as readInt
-import system.io.print as print
+declare sayHello as Nothing -> Nothing
 
-declare fact as Integer n -> Integer {
-
-    if n = 0 {
-        return 1
-    } else {
-        return n * fact(n-1)
+declare SimpleClass as class (
+    foo : Integer <- 13
+    bar : Double
+) {
+    classField  <- 12
+    
+    foox: Integer n -> Integer {
+        return n + 1 + foox(n-1) + classField - foo
     }
-
 }
 
-declare fib as Integer n -> Integer {
-    if n = 0 or n = 1 {
-        return 1
-    } else {
-        return fib(n-1) + fib(n-2)
+declare ComplexClass as class <SimpleClass> {
+    foox: Integer n -> Double {
+        return n - 2
     }
+}
+
+declare fact as Integer n -> Integer {
+    if (n = 0) {
+        return 1
+    }
+
+    return n * fact(n-1)
 }
 
 declare main as String[] args -> Nothing {
-    queriesCnt <- Integer.parseInt(args[1])
+    let foo: sayHello 
+    let x : Double {empty}
+    let y <- 12.32
+    x <- 43
+    let z {x = y}
+    let f <- (12 + x < 45 + y) and (12 < 13) or "abc" <= "abcd" and empty
+    let arr <- [12, true, 33.3]
+    let arrElem <- arr[5]
 
-    fibNumbers: IntegerVector // Default constructor is called
-    factNumbers <- new IntegerVector(queriesCnt)
+    let simpleVariable <- SimpleClass()
+    simpleVariable.foox(arr.length)
+    let bar <- SimpleClass.bar
 
-    for _ in [0; queriesCnt) {
-        q <- readInt()
-        fibNumbers.add(fib(q))
-        factNumbers.add(fact(q))
-    }
-
-    for q in [0; queriesCnt) {
-        print("Fib " + q + " is " + fib[q])
-        print("Fact " + q + " is " + fact[q])
-    }
-
-    fibNumbers.clear()
-    factNumbers.clear()
-}
-
-declare IntegerCollection as interface {
-    add:        Integer -> Boolean
-    remove:     Integer -> Boolean
-    size:       Nothing -> Boolean
-    forEach:    (Integer -> Nothing) -> Nothing
-}
-
-declare IntegerVector as IntegerCollection {
-    data:       Integer[10] <- []
-    size:       Integer     <- 0
-    capacity:   Integer     <- 10
-
-    new: Integer size -> IntegerVector {
-        this.capacity   <- size
-        this.data       <- new Integer[size]
-
-        return this
-    }
-
-    add: Integer el -> Boolean {
-        if size = capacity {
-            newData  <- new Integer[capacity * 2]
-            capacity <- capacity * 2
-
-            for i in [0; size) {
-                newData[i] <- data[i]
-            }
-            
-            data <- newData
+    if (f) {
+        for i in [1; 5] {
+            x  <- i + x
         }
-
-        data[size] <- el;
-        size <- size + 1
-        return true
+    } else if (z) {
+        f <- true
+        let x <- "Hello"
+    } else {
+        let bar <- 1212
+        return
     }
 
-    remove: Integer el -> Boolean {
-        idx <- -1
-
-        for i in [0; size) {
-            if data[i] = el {
-                idx <- i
-            }
-        }
-
-        if id = -1 {
-            return false
-        }
-
-        for i in [idx; size - 1) {
-            data[i] <- data[i+1]
-        }
-
-        size = size - 1
-        return true
-    }
-
-
-    size: Nothing -> Integer <- size
-
-    forEach: Integer -> Nothing f -> Nothing {
-        for i in [0; size) {
-            f(data[i])
-        }
-    }
-
-    
-    remove: Integer el -> Nothing {
-        remove(el)
-    }
-
-    clear: Nothing -> Nothing {
-        // forEach(this::remove)
-        forEach(el -> this.remove(el))
-    }
 }
 ```
 
