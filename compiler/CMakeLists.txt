@@ -62,6 +62,7 @@ add_executable(
         interpretation/Expressions.cpp
         interpretation/Statements.cpp
         interpretation/TopLevelDeclarations.cpp
-)
+        interpretation/Unused.cpp
+        intermediate/RuntimeValues.h intermediate/RuntimeValues.cpp)
 
 target_include_directories(compiler PRIVATE ${CMAKE_SOURCE_DIR})

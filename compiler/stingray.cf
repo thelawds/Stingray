@@ -1,7 +1,7 @@
 comment "//" ;
 comment "/*" "*/" ;
 
-Program.                        Program_ ::= [Decl];
+Program.                        Program_ ::= [Decl] [Statement];
 terminator Decl "";
 
 Declaration.                    Decl ::= "declare" Ident "as" TypeReference;

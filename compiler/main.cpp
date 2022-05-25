@@ -7,6 +7,7 @@
 #include "syntax/ParserError.H"
 #include "syntax/Printer.H"
 #include "typecheck/TypeChecker.h"
+#include "interpretation/InterpretationVisitor.h"
 
 void usage() {
     printf("usage: Call with one of the following argument combinations:\n");
@@ -64,7 +65,10 @@ int main(int argc, char **argv) {
             auto *pTypeChecker = new TypeChecker();
             pTypeChecker->visitProgram_(parse_tree);
 
-//            delete p;
+            auto *interpreter = new InterpretationVisitor();
+            interpreter->visitProgram_(parse_tree);
+
+            //            delete p;
 //            delete s;
             delete pTypeChecker;
         }
