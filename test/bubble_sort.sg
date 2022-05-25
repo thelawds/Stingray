@@ -1,10 +1,30 @@
-declare bubbleSort as Double[] arr -> Double[]{
-    for i in [1; 10){
-        for j in [1; 10){
+
+declare print as Double[] -> Nothing 
+
+declare bubbleSort as Double[] arr -> Double[] {
+
+    let i {1}
+    let j {1}
+
+    while (i < arr.length) {
+        while (j < arr.length) {
             let temp <- arr[j]
-            arr[j] <- arr[j+1]
+            arr[j] <- arr[j + 1]
             arr[j+1] <- temp
+            j {j + 1}
         }
+        i {i + 1}
     }
+
+    return arr
+}
+
+declare main as String[] args -> Nothing {
+    let arr : Double[] <- [3, 4, 5, 2, 1, 3, 4, 8, 9, 10]
+    let sortedArray {
+        bubbleSort(arr)
+    }
+
     print(arr)
+    print(sortedArray)
 }

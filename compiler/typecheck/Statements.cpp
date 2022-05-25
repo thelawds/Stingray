@@ -1,14 +1,13 @@
 #include "TypeChecker.h"
 
 void TypeChecker::visitStatementAssignment(StatementAssignment *p) {
-    if (!symbolTable.contains(p->ident_)) {
-        error("Can not assign value to undeclared variable " + p->ident_, p);
-    }
 
-    auto *newType = visit(p->value_);
-    if (!newType->coercesTo(symbolTable[p->ident_])) {
-        error("Can not assign value of type " + newType->toString() + " to variable " + p->ident_ + " of type " +
-              symbolTable[p->ident_]->toString(), p);
+    auto *lhsType = visit(p->expression_);
+    auto *rhsType = visit(p->value_);
+
+    if (!rhsType->coercesTo(lhsType)) {
+        error("Can not assign value of type " + rhsType->toString() + " to variable of type " +
+              lhsType->toString(), p);
     }
 }
 
