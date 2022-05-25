@@ -18,6 +18,16 @@ struct IntegerValue : RuntimeValue {
     std::string toString() override;
 
     RuntimeValue *add(RuntimeValue *other) override;
+
+    RuntimeValue *multiply(RuntimeValue *other) override;
+
+    RuntimeValue *deduct(RuntimeValue *other) override;
+
+    RuntimeValue *divide(RuntimeValue *other) override;
+
+    RuntimeValue *mod(RuntimeValue *other) override;
+
+    RuntimeValue *pow(RuntimeValue *other) override;
 };
 
 struct DoubleValue : RuntimeValue {
@@ -28,6 +38,14 @@ struct DoubleValue : RuntimeValue {
     std::string toString() override;
 
     RuntimeValue *add(RuntimeValue *other) override;
+
+    RuntimeValue *multiply(RuntimeValue *other) override;
+
+    RuntimeValue *deduct(RuntimeValue *other) override;
+
+    RuntimeValue *divide(RuntimeValue *other) override;
+
+    RuntimeValue *pow(RuntimeValue *other) override;
 };
 
 #endif // COMPILER_RUNTIMEVALUES_H

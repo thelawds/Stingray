@@ -24,3 +24,33 @@ void InterpretationVisitor::visitArithmeticSum(ArithmeticSum *p) {
     auto *rhs = visit(p->expression_2);
     returnValue(lhs->add(rhs));
 }
+
+void InterpretationVisitor::visitArithmeticProduct(ArithmeticProduct *p) {
+    auto *lhs = visit(p->expression_1);
+    auto *rhs = visit(p->expression_2);
+    returnValue(lhs->multiply(rhs));
+}
+
+void InterpretationVisitor::visitArithmeticDifference(ArithmeticDifference *p) {
+    auto *lhs = visit(p->expression_1);
+    auto *rhs = visit(p->expression_2);
+    returnValue(lhs->deduct(rhs));
+}
+
+void InterpretationVisitor::visitArithmeticQuotient(ArithmeticQuotient *p) {
+    auto *lhs = visit(p->expression_1);
+    auto *rhs = visit(p->expression_2);
+    returnValue(lhs->divide(rhs));
+}
+
+void InterpretationVisitor::visitArithmeticModulus(ArithmeticModulus *p) {
+    auto *lhs = visit(p->expression_1);
+    auto *rhs = visit(p->expression_2);
+    returnValue(lhs->mod(rhs));
+}
+
+void InterpretationVisitor::visitArithmeticExponentiation(ArithmeticExponentiation *p) {
+    auto *lhs = visit(p->expression_1);
+    auto *rhs = visit(p->expression_2);
+    returnValue(lhs->pow(rhs));
+}
