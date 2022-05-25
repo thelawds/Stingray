@@ -2,8 +2,8 @@
 #ifndef COMPILER_TYPECHECKER_H
 #define COMPILER_TYPECHECKER_H
 
-#include "intermediate/StingrayTypes.h"
 #include "intermediate/LayeredTable.h"
+#include "intermediate/StingrayTypes.h"
 #include "syntax/Absyn.H"
 #include "syntax/Printer.H"
 #include <memory>
@@ -121,11 +121,13 @@ class TypeChecker : public Visitor {
     void visitStatementFunctionCall(StatementFunctionCall *p) override;
     void visitFunctionCallExpr(FunctionCallExpr *p) override;
 
+    void visitClassDecl(ClassDecl *p) override;
+    void visitClassDeclaration(ClassDeclaration *p) override;
+    void visitClassType(ClassType *p) override;
     void visitExtends(Extends *p) override;
     void visitFieldDef(FieldDef *p) override;
     void visitStatics(Statics *p) override;
     void visitCBody(CBody *p) override;
-    void visitClassType(ClassType *p) override;
     void visitExtendsList(ExtendsList *p) override;
     void visitFieldDeclaration(FieldDeclaration *p) override;
     void visitFieldDefinition(FieldDefinition *p) override;
@@ -139,13 +141,17 @@ class TypeChecker : public Visitor {
 
   private:
     std::stack<StingrayType *> returnedTypes; // todo: mange memory correctly
+    std::stack<std::string> returnedFieldNames;
     std::unordered_map<std::string, StingrayType *> UserDefinedTypes;
     LayeredTable<StingrayType> symbolTable;
+
+    std::string currentClassName;
+    SgClassType *currentClassType;
 
     std::string currentFunctionName;
     SgFunctionType *currentFunctionType;
 
-    SgBaseType* NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
+    SgBaseType *NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
     SgBaseType *INTEGER_TYPE = new SgBaseType(EBaseType::INTEGER);
 
     PrintAbsyn *printer = new PrintAbsyn();
@@ -155,7 +161,7 @@ class TypeChecker : public Visitor {
     void returnValue(EBaseType);
     StingrayType *visit(Visitable *);
 
-    void error(const std::string &, Visitable *);              // todo: provide better errors
+    void error(const std::string &, Visitable *);                     // todo: provide better errors
     static void printType(const std::string &, const StingrayType *); // todo: use only for debug
 };
 

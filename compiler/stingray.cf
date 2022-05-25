@@ -14,11 +14,13 @@ StringType.                     TypeReference ::= "String";
 FunctionDeclType.               TypeReference ::= FuncDecl;
 FunctionDefType.                TypeReference ::= FuncDefn;
 ArrayType.                      TypeReference ::= TypeReference "[]";
-ClassType.                      TypeReference ::= "class" Extends Statics "{" CBody "}";
+ClassType.                      TypeReference ::= ClassDecl;
 UserType.                       TypeReference ::= Ident;
 
+ClassDeclaration.               ClassDecl ::= "class" Extends Statics "{" CBody "}";
+
 ExtendsEmpty.                   Extends ::= ;
-ExtendsList.                    Extends ::= "<" [Ident] ">";
+ExtendsList.                    Extends ::= "<" Ident ">";
 separator Ident ",";
 
 FieldDeclaration.               FieldDef ::= Ident ":" TypeReference;
@@ -68,7 +70,7 @@ ValueBraced.                    Value ::= "{" Expression "}";
 
 terminator Statement "";
 
-MethodReference.                Expression ::= Ident "::" Ident;
+MethodReference.                Expression ::= Expression "::" Ident;
 
 RelationalEquals.               Expression5 ::= Expression5 "=" Expression6;
 RelationalNotEquals.            Expression5 ::= Expression5 "!=" Expression6;

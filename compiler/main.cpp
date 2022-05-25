@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
             auto *pTypeChecker = new TypeChecker();
             pTypeChecker->visitProgram_(parse_tree);
 
-            auto *interpreter = new InterpretationVisitor();
-            interpreter->visitProgram_(parse_tree);
+//            auto *interpreter = new InterpretationVisitor();
+//            interpreter->visitProgram_(parse_tree);
 
             //            delete p;
 //            delete s;

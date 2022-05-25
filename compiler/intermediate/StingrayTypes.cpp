@@ -116,3 +116,56 @@ std::string SgFunctionType::toString() const {
 }
 
 void SgFunctionType::addRangeType(StingrayType *t) { range.push_back(t); }
+
+bool SgClassType::equals(StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::CLASS) {
+        auto *classT = dynamic_cast<SgClassType *>(type);
+        return classT->className == className;
+    }
+
+    return false;
+}
+
+bool SgClassType::coercesTo(StingrayType *type) const {
+
+    return this->equals(type) || this->parentClass != nullptr && this->parentClass->coercesTo(type);
+
+}
+
+std::string SgClassType::toString() const {
+    std::string extends;
+    std::string statics = (classVariables.empty() ? "(" : "(\n");
+    std::string body = (objectVariables.empty() ? "{" : "{\n");
+
+    if (parentClass) {
+        extends = "< " + parentClass->toString() + "> ";
+    }
+
+    for (auto &[name, type] : classVariables){
+        statics += "\t" + name + ": " + type->toString() + "\n";
+    }
+    statics += ")";
+
+    for (auto &[name, type] : objectVariables){
+        body += "\t" + name + ": " + type->toString() + "\n";
+    }
+    body += "}";
+
+    return "class " + className + extends + statics + body;
+}
+
+SgClassType::SgClassType(std::string name) : StingrayType(TypeCategory::CLASS), className(std::move(name)) {}
+
+bool SgClassType::contains(const std::string& fieldName) const {
+    return classVariables.contains(fieldName) || objectVariables.contains(fieldName);
+}
+
+StingrayType *SgClassType::get(const std::string &fieldName){
+    if (classVariables.contains(fieldName)) {
+        return classVariables[fieldName];
+    } else if (objectVariables.contains(fieldName)) {
+        return objectVariables[fieldName];
+    } else {
+        return nullptr;
+    }
+}

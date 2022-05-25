@@ -3,12 +3,13 @@
 #define COMPILER_STINGRAYTYPES_H
 
 #include <string>
+#include "unordered_map"
 #include <vector>
 
 #define ALLOWS_IMPLICIT_CONVERSION
 
 enum class EBaseType { NOTHING, BOOLEAN, INTEGER, DOUBLE, STRING, UNTYPED };
-enum class TypeCategory { BASE, ARRAY, FUNCTION };
+enum class TypeCategory { BASE, ARRAY, FUNCTION, CLASS };
 
 struct StingrayType {
     const TypeCategory typeCategory;
@@ -60,6 +61,24 @@ struct SgFunctionType : StingrayType {
     bool coercesTo(StingrayType *type) const override;
 
     std::string toString() const override;
+};
+
+struct SgClassType : StingrayType {
+    std::string className;
+    StingrayType *parentClass{nullptr};
+
+    std::unordered_map<std::string, StingrayType *> classVariables;
+    std::unordered_map<std::string, StingrayType *> objectVariables;
+
+    SgClassType(std::string name);
+
+    bool equals(StingrayType *type) const override;
+    bool coercesTo(StingrayType *type) const override;
+    std::string toString() const override;
+
+    bool contains(const std::string &fieldName) const;
+
+    StingrayType *get(const std::string &fieldName);
 };
 
 #endif // COMPILER_STINGRAYTYPES_H

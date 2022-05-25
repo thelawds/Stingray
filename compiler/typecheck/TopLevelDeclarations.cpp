@@ -3,6 +3,8 @@
 void TypeChecker::visitDeclaration(Declaration *p) {
     if (dynamic_cast<FunctionDefType *>(p->typereference_) || dynamic_cast<FunctionDeclType *>(p->typereference_)) {
         currentFunctionName = p->ident_;
+    } else if (dynamic_cast<ClassType *>(p->typereference_)) {
+        currentClassName = p->ident_;
     }
 
     if (symbolTable.contains(p->ident_)) {

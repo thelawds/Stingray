@@ -26,6 +26,13 @@ void TypeChecker::visitListDecl(ListDecl *p) {}
 void TypeChecker::visitListTypeReference(ListTypeReference *p) {}
 void TypeChecker::visitListFuncParam(ListFuncParam *p) {}
 void TypeChecker::visitFuncCall(FuncCall *p) {}
+void TypeChecker::visitClassDecl(ClassDecl *p) {}
+void TypeChecker::visitExtends(Extends *p) {}
+void TypeChecker::visitStatics(Statics *p) {}
+void TypeChecker::visitFieldDef(FieldDef *p) {}
+void TypeChecker::visitCBody(CBody *p) {}
+void TypeChecker::visitListIdent(ListIdent *p) {}
+void TypeChecker::visitListFieldDef(ListFieldDef *p) {}
 /**
  * Ranges are not type-checked
  */

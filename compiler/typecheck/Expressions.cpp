@@ -449,13 +449,28 @@ void TypeChecker::visitFunctionCall(FunctionCall *p) {
         }
 
         returnValue(funcType->domain);
+    } else if (refType->typeCategory == TypeCategory::CLASS) {
+        auto *classType = dynamic_cast<SgClassType *>(refType);
+        returnValue(classType);
     } else {
         error("Unable to apply call operator to variable of type " + refType->toString(), p);
     }
 }
 
 void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {
-    // todo: implement after classes
+    auto *referencableType = visit(p->expression_);
+
+    if (referencableType->typeCategory != TypeCategory::CLASS) {
+        error("Can not apply referencing operator '.' to the variable of type " + referencableType->toString(), p);
+    }
+
+    auto *classType = dynamic_cast<SgClassType *>(referencableType);
+
+    if (classType->contains(p->ident_)) {
+        returnValue(classType->get(p->ident_));
+    } else {
+        error("Class " + classType->className + " does not contain member named " + p->ident_, p);
+    }
 }
 
 void TypeChecker::visitMethodReference(MethodReference *p) {
