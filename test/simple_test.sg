@@ -12,6 +12,12 @@ declare SimpleClass as class (
     }
 }
 
+declare ComplexClass as class <SimpleClass> {
+    foox: Integer n -> Double {
+        return n - 2
+    }
+}
+
 declare fact as Integer n -> Integer {
     if (n = 0) {
         return 1
@@ -31,7 +37,7 @@ declare main as String[] args -> Nothing {
     let arrElem <- arr[5]
 
     let simpleVariable <- SimpleClass()
-    simpleVariable.foox(12)
+    simpleVariable.foox(arr.length)
     let bar <- SimpleClass.bar
 
     if (f) {

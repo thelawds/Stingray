@@ -460,6 +460,15 @@ void TypeChecker::visitFunctionCall(FunctionCall *p) {
 void TypeChecker::visitFieldReferenceTerm(FieldReferenceTerm *p) {
     auto *referencableType = visit(p->expression_);
 
+    bool isArrayOrString = referencableType->typeCategory == TypeCategory::ARRAY ||
+                           referencableType->typeCategory == TypeCategory::BASE &&
+                               dynamic_cast<SgBaseType *>(referencableType)->value == EBaseType::STRING;
+
+    if (isArrayOrString && p->ident_ == "length") {
+        returnValue(EBaseType::INTEGER);
+        return;
+    }
+
     if (referencableType->typeCategory != TypeCategory::CLASS) {
         error("Can not apply referencing operator '.' to the variable of type " + referencableType->toString(), p);
     }

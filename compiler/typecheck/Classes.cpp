@@ -9,7 +9,6 @@ void TypeChecker::visitClassDeclaration(ClassDeclaration *p) {
     }
 
     symbolTable.pushLayer();
-    //    symbolTable.putAtCurrentLayer("this", currentClassType); // todo: is it needed?
 
     p->statics_->accept(this);
     p->cbody_->accept(this);
