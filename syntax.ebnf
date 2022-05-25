@@ -35,8 +35,7 @@ Statement        ::= 'let' identifier [':' TypeReference] [Value] # done
 
 IfStatement     ::= 'if' Expression Body ['else' (IfStatement | Body)]  #done
 
-LambdaExpression ::= NamedFunctionRange '->' (Expression | Body) 
-                   | '(' [identifier {',' identifier}] ')' -> (Expression | Body)
+LambdaExpression ::= '(' {identifier} ')' Body
 
 MethodReference  ::= identifier '::' identifier # done
 
