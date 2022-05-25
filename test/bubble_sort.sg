@@ -1,0 +1,10 @@
+declare bubbleSort as Double[] arr -> Double[]{
+    for i in [1; 10){
+        for j in [1; 10){
+            let temp <- arr[j]
+            arr[j] <- arr[j+1]
+            arr[j+1] <- temp
+        }
+    }
+    print(arr)
+}
