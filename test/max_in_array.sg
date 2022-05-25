@@ -1,0 +1,11 @@
+declare fooMax as Double[] arr -> Double {
+    let n <- 10
+    let max <- 0
+    while (n != 0)  {
+        if max < arr[i]{
+            max <- arr[i]
+        }
+        n <- n-1
+    }
+    return max
+}
