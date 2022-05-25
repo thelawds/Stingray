@@ -1,0 +1,10 @@
+declare fooMin as Double[] arr -> Double {
+    let min <- arr[0]
+    while (n != 0)  {
+        if min > arr[i]{
+            min <- arr[i]
+        }
+        n = n - 1
+    }
+    return min
+}
