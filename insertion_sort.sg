@@ -1,0 +1,12 @@
+declare insertionSort as Double[] arr -> Double[]{
+    for i in range [1;10){
+        let j <- i
+        let temp <- arr[j]
+        while (j > 0 and temp < arr[j-1]){
+            arr[j] <- arr[j-1]
+            j <- j - 1 
+        }
+        arr[j] <- temp
+    }
+    return arr
+}
