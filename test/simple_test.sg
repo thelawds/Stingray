@@ -33,6 +33,8 @@ declare main as String[] args -> Nothing {
         return [j, k]
     }
 
+    let resultLambda {lambda(53)}
+
     let foo: sayHello 
     let x : Double {empty}
     let y <- 12.32
