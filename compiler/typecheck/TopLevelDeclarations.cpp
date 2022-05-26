@@ -3,7 +3,7 @@
 
 void TypeChecker::visitDeclaration(Declaration *p) {
     if (dynamic_cast<FunctionDefType *>(p->typereference_) || dynamic_cast<FunctionDeclType *>(p->typereference_)) {
-        currentFunctionName = p->ident_;
+        funcNames.push(p->ident_);
     } else if (dynamic_cast<ClassType *>(p->typereference_)) {
         currentClassName = p->ident_;
     }
@@ -22,22 +22,22 @@ void TypeChecker::visitDeclaration(Declaration *p) {
         symbolTable.putAtCurrentLayer(p->ident_, type);
     }
 
-    currentFunctionType = nullptr;
-    currentFunctionName = "";
+    funcTypes.pop();
+    funcNames.pop();
 }
 
 void TypeChecker::visitFunctionDeclaration(FunctionDeclaration *p) {
     auto *range = p->funcrange_;
     auto *domain = p->funcdomain_;
 
-    currentFunctionType = new SgFunctionType({}, visit(domain));
+    funcTypes.push(new SgFunctionType({}, visit(domain)));
     range->accept(this);
 
-    std::cout << "At function " << currentFunctionName << ":" << std::endl;
-    printType(currentFunctionName, currentFunctionType);
+    std::cout << "At function " << funcNames.top() << ":" << std::endl;
+    printType(funcNames.top(), funcTypes.top());
     std::cout << "------" << std::endl;
 
-    returnValue(currentFunctionType);
+    returnValue(funcTypes.top());
 }
 
 void TypeChecker::visitFunctionDefinition(FunctionDefinition *p) {
@@ -45,36 +45,40 @@ void TypeChecker::visitFunctionDefinition(FunctionDefinition *p) {
     auto *domain = p->funcdomain_;
 
     symbolTable.pushLayer();
-    symbolTable.putAtCurrentLayer(currentFunctionName, nullptr);
+    symbolTable.putAtCurrentLayer(funcNames.top(), nullptr);
 
-    currentFunctionType = new SgFunctionType({}, visit(domain));
+    funcTypes.push(new SgFunctionType({}, visit(domain)));
     range->accept(this);
 
-    symbolTable[currentFunctionName] = currentFunctionType;
+    symbolTable[funcNames.top()] = funcTypes.top();
 
     p->body__->accept(this);
 
-    for (auto *&var : currentFunctionType->range) {
+    size_t i = 0;
+    for (auto *&var : funcTypes.top()->range) {
         if (auto *undecided = dynamic_cast<SgAutoType *>(var)) {
             var = undecided->decide();
+            ++i;
 
             if (!var) {
-                error("Some variables can not be inferred in function " + currentFunctionName, p);
+                error("Variable at position " + std::to_string(i) + " can not be inferred in function " +
+                          funcNames.top(),
+                      p);
             }
         }
     }
 
-    if (auto *undecided = dynamic_cast<SgAutoType *>(currentFunctionType->domain)) {
-        currentFunctionType->domain = undecided->decide();
+    if (auto *undecided = dynamic_cast<SgAutoType *>(funcTypes.top()->domain)) {
+        funcTypes.top()->domain = undecided->decide();
 
-        if (!currentFunctionType->domain) {
-            error("Return type can not be inferred in function " + currentFunctionName, p);
+        if (!funcTypes.top()->domain) {
+            error("Return type can not be inferred in function " + funcNames.top(), p);
         }
     }
 
-    returnValue(currentFunctionType);
+    returnValue(funcTypes.top());
 
-    std::cout << "At function " << currentFunctionName << ":" << std::endl;
+    std::cout << "At function " << funcNames.top() << ":" << std::endl;
     symbolTable.forEach(printType);
     std::cout << "------" << std::endl;
 
@@ -87,14 +91,14 @@ void TypeChecker::visitFunctionRangeSingle(FunctionRangeSingle *p) {
     auto *type = visit(p->typereference_);
 
     if (!type->equals(NOTHING_TYPE)) {
-        currentFunctionType->addRangeType(type);
+        funcTypes.top()->addRangeType(type);
     }
 }
 
 void TypeChecker::visitFunctionRangeMultiple(FunctionRangeMultiple *p) {
-    currentFunctionType->addRangeType(visit(p->typereference_));
+    funcTypes.top()->addRangeType(visit(p->typereference_));
     for (auto *ref : *p->listtypereference_) {
-        currentFunctionType->addRangeType(visit(ref));
+        funcTypes.top()->addRangeType(visit(ref));
     }
 }
 
@@ -109,12 +113,12 @@ void TypeChecker::visitFunctionParameter(FunctionParameter *p) {
 }
 
 void TypeChecker::visitFunctionRangeSingleNamed(FunctionRangeSingleNamed *p) {
-    currentFunctionType->addRangeType(visit(p->funcparam_));
+    funcTypes.top()->addRangeType(visit(p->funcparam_));
 }
 
 void TypeChecker::visitFunctionRangeMultipleNamed(FunctionRangeMultipleNamed *p) {
     for (auto *ref : *p->listfuncparam_) {
-        currentFunctionType->addRangeType(visit(ref));
+        funcTypes.top()->addRangeType(visit(ref));
     }
 }
 

@@ -61,7 +61,8 @@ void TypeChecker::visitClassBody(ClassBody *p) {
 
 void TypeChecker::visitFieldDeclaration(FieldDeclaration *p) {
     if (dynamic_cast<FunctionDefType *>(p->typereference_) || dynamic_cast<FunctionDeclType *>(p->typereference_)) {
-        currentFunctionName = p->ident_;
+        funcNames.push(p->ident_);
+//        currentFunctionName = p->ident_;
     }
 
     if (currentClassType->contains(p->ident_)) {

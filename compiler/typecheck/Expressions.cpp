@@ -20,7 +20,6 @@ void TypeChecker::visitRelationalNotEquals(RelationalNotEquals *p) {
     } else {
         error("Types for relational != should be equal or derived from common base", p);
     }
-
 }
 
 void TypeChecker::visitRelationalLess(RelationalLess *p) {
@@ -143,23 +142,20 @@ void TypeChecker::visitArithmeticSum(ArithmeticSum *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
     auto *rhsType = visit(p->expression_2); // validate rhs
 
-    if (lhsType->typeCategory == TypeCategory::BASE && rhsType->typeCategory == TypeCategory::BASE) {
-        auto bLhsType = dynamic_cast<SgBaseType *>(lhsType)->value;
-        auto bRhsType = dynamic_cast<SgBaseType *>(rhsType)->value;
+    bool lhsNumeric = lhsType->coercesTo(DOUBLE_TYPE) || lhsType->coercesTo(INTEGER_TYPE);
+    bool rhsNumeric = rhsType->coercesTo(DOUBLE_TYPE) || rhsType->coercesTo(INTEGER_TYPE);
 
-        if (bLhsType == bRhsType && bLhsType == EBaseType::INTEGER) {
+    if (lhsNumeric && rhsNumeric) {
+
+        if (lhsType->equals(INTEGER_TYPE) && rhsType->equals(INTEGER_TYPE)) {
             returnValue(EBaseType::INTEGER);
             return;
-        }
-
-        if (bLhsType == bRhsType && bLhsType == EBaseType::DOUBLE ||
-            bLhsType == EBaseType::DOUBLE && bRhsType == EBaseType::INTEGER ||
-            bLhsType == EBaseType::INTEGER && bRhsType == EBaseType::DOUBLE) {
-
+        } else {
             returnValue(EBaseType::DOUBLE);
             return;
         }
 
+    } else {
         auto *stringType = new SgBaseType(EBaseType::STRING); // todo delete
         if ((lhsType->equals(stringType) || rhsType->equals(stringType)) &&
             lhsType->coercesTo(stringType) && // todo: optimize
@@ -169,13 +165,9 @@ void TypeChecker::visitArithmeticSum(ArithmeticSum *p) {
             return;
         }
 
-        error("Unexpected types for arithmetic + operator. Expected both numerical or string, but got: " +
-                  lhsType->toString() + " and " + rhsType->toString(),
-              p);
-
-    } else {
-        error("Types for arithmetic + should be base", p);
+        error("Types for arithmetic + should be base numeric or string", p);
     }
+
 }
 
 void TypeChecker::visitArithmeticDifference(ArithmeticDifference *p) {
@@ -404,7 +396,7 @@ void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {
 
     auto *arr = dynamic_cast<SgArrayType *>(lhsType);
 
-    if (!arr){
+    if (!arr) {
         arr = dynamic_cast<SgArrayType *>(dynamic_cast<SgAutoType *>(lhsType)->constraint);
     }
 
@@ -416,10 +408,16 @@ void TypeChecker::visitFunctionCallExpr(FunctionCallExpr *p) { returnValue(visit
 void TypeChecker::visitFunctionCall(FunctionCall *p) {
     auto *refType = visit(p->expression_);
 
-    if (refType->isFuncion()) {
+    if (refType->isFunction(p->listexpression_->size())) {
         // todo: check parameters
         // todo: apply type inference
-        auto *funcType = dynamic_cast<SgFunctionType *>(refType);
+
+        SgFunctionType *funcType;
+        if (auto *undecided = dynamic_cast<SgAutoType *>(refType)) {
+            funcType = dynamic_cast<SgFunctionType *>(undecided->constraint);
+        } else {
+            funcType = dynamic_cast<SgFunctionType *>(refType);
+        }
 
         if (funcType->range.size() != p->listexpression_->size()) {
             error("Can not call function. Size of formal parameters differs from actual given: expected " +

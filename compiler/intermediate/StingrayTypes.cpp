@@ -1,5 +1,6 @@
 #include "StingrayTypes.h"
 
+#include <iostream>
 #include <utility>
 
 StingrayType::StingrayType(const TypeCategory typeCategory) : typeCategory(typeCategory) {}
@@ -99,7 +100,7 @@ bool SgArrayType::coercesTo(const StingrayType *type) const {
                                      this->parentType->coercesTo(dynamic_cast<const SgArrayType *>(type)->parentType);
 }
 
-std::string SgArrayType::toString() const { return parentType->toString() + "[]"; }
+std::string SgArrayType::toString() const { return "Array<" + parentType->toString() + ">"; }
 
 StingrayType *SgArrayType::copy() const { return new SgArrayType(parentType); }
 
@@ -146,8 +147,13 @@ bool SgFunctionType::coercesTo(const StingrayType *type) const {
 
 std::string SgFunctionType::toString() const {
     std::string rangeStr;
+    bool needComma = false;
     for (auto *rItem : range) {
-        rangeStr += rItem->toString() + ", ";
+        if (needComma) {
+            rangeStr += ", ";
+        }
+        rangeStr += rItem->toString();
+        needComma = true;
     }
 
     return "(" + rangeStr + ") -> " + domain->toString();
@@ -277,10 +283,26 @@ void SgAutoType::coercedBy(const StingrayType *type) const {
 
 StingrayType *SgAutoType::decide() const {
     if (auto constraintArray = dynamic_cast<SgArrayType *>(constraint)) {
-
         if (auto constraintUndecided = dynamic_cast<SgAutoType *>(constraintArray->parentType)) {
             constraintArray->parentType = constraintUndecided->decide();
-            if (!constraint) {
+            if (!constraintArray->parentType) {
+                decidable = false;
+            }
+        }
+    } else if (auto constraintFunction = dynamic_cast<SgFunctionType *>(constraint)) {
+        for (auto *&rangeEl : constraintFunction->range) {
+            if (auto *rangeElUndecided = dynamic_cast<SgAutoType *>(rangeEl)) {
+                rangeEl = rangeElUndecided->decide();
+                if (!rangeEl) {
+                    decidable = false;
+                    break;
+                }
+            }
+        }
+
+        if (auto *domainUndecided = dynamic_cast<SgAutoType *>(constraintFunction->domain)) {
+            constraintFunction->domain = domainUndecided->decide();
+            if (!constraintFunction->domain) {
                 decidable = false;
             }
         }
@@ -303,5 +325,20 @@ bool SgAutoType::isArray() {
         constraint = new SgArrayType(new SgAutoType());
     }
 
+    return true;
+}
+bool SgAutoType::isFunction(size_t rangeSize) {
+    if (constraint) {
+        decidable = constraint->typeCategory == TypeCategory::FUNCTION;
+    } else {
+        function = true;
+
+        std::vector<StingrayType *> range(rangeSize);
+        for (int i = 0; i < rangeSize; ++i) {
+            range[i] = new SgAutoType();
+        }
+
+        constraint = new SgFunctionType(range, new SgAutoType);
+    }
     return true;
 }

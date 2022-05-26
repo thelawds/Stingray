@@ -26,7 +26,7 @@ struct StingrayType {
     virtual StingrayType *copy() const = 0;
 
     inline virtual bool isArray() { return false; }
-    inline virtual bool isFuncion() { return false; }
+    inline virtual bool isFunction(size_t rangeSize) { return false; }
 
 };
 
@@ -39,13 +39,14 @@ struct SgAutoType : StingrayType {
 
     bool isArray() override;
 
-    inline bool isFuncion() override { return false; }
+    bool isFunction(size_t rangeSize) override;
 
     std::string toString() const override;
     virtual StingrayType *copy() const override;
 
     StingrayType *decide() const;
 
+    mutable bool function{false};
     mutable bool array{false};
     mutable bool decidable{true};
     mutable StingrayType *constraint;
@@ -95,7 +96,7 @@ struct SgFunctionType : StingrayType {
     std::string toString() const override;
     virtual StingrayType *copy() const override;
 
-    inline virtual bool isFuncion() { return true; }
+    inline bool isFunction(size_t rangeSize) override { return range.size() == rangeSize; }
 };
 
 struct SgClassType : StingrayType {

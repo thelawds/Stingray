@@ -20,11 +20,22 @@ declare ComplexClass as class <SimpleClass> {
 }
 
 declare fact as Auto n -> Auto {
-    if (n[3][3] = 0.0) {
+    if (n[3][3](1, 2.0) = 0.0) {
         return [1.0]
     }
 
-    return [n[4][1] * fact(n[1][3]-1)[0]]
+    return [n[4][1](1, 2.0) * fact(n[1][3](4, 5.2)-1)[0]]
+}
+
+declare test as (Auto int, Auto intArr, Auto funcIntDoubleToDouble) -> Auto {
+    let i <- int - 12
+    let j <- intArr[14] - i
+
+    let result: Auto k -> Auto {
+        return i + k - j * funcIntDoubleToDouble[3](12, 33.3)
+    }
+
+    return result
 }
 
 declare main as String[] args -> Nothing {

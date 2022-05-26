@@ -149,8 +149,8 @@ class TypeChecker : public Visitor {
     std::string currentClassName;
     SgClassType *currentClassType;
 
-    std::string currentFunctionName;
-    SgFunctionType *currentFunctionType;
+    std::stack<std::string> funcNames;
+    std::stack<SgFunctionType *> funcTypes;
 
     SgBaseType *NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
     SgBaseType *INTEGER_TYPE = new SgBaseType(EBaseType::INTEGER);

@@ -16,10 +16,22 @@ void TypeChecker::visitStatementVarDecl(StatementVarDecl *p) {
         error("Error at variable definition " + p->ident_ + ". Variable already defined", p);
     }
 
+    bool needToPopNames{false};
+
+    if (dynamic_cast<FunctionDefType *>(p->typereference_)) {
+        funcNames.push(p->ident_);
+        needToPopNames = true;
+    }
+
     StingrayType *type = visit(p->typereference_);
 
     if (type->equals(new SgBaseType(EBaseType::NOTHING))) {
         error("Variable can not have type NOTHING", p);
+    }
+
+    if (needToPopNames) {
+        funcNames.pop();
+        funcTypes.pop();
     }
 
     symbolTable.putAtCurrentLayer(p->ident_, type);
@@ -123,10 +135,10 @@ void TypeChecker::visitStatementFor(StatementFor *p) {
 
 void TypeChecker::visitStatementReturnValue(StatementReturnValue *p) {
     auto *returnedType = visit(p->expression_);
-    if (!returnedType->coercesTo(currentFunctionType->domain)) {
+    if (!returnedType->coercesTo(funcTypes.top()->domain)) {
         printer->print(p);
         error("Returning " + returnedType->toString() + " which can not be coerced to " +
-              currentFunctionType->domain->toString(),p);
+              funcTypes.top()->domain->toString(),p);
     }
 }
 
