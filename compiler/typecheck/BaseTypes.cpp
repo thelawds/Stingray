@@ -13,6 +13,8 @@ void TypeChecker::visitIntegerTerm(IntegerTerm *p) { returnValue(new SgBaseType(
 
 void TypeChecker::visitDoubleTerm(DoubleTerm *p) { returnValue(new SgBaseType(EBaseType::DOUBLE)); }
 
+void TypeChecker::visitAutoType(AutoType *p) { returnValue(new SgAutoType()); }
+
 void TypeChecker::visitVariableReferenceTerm(VariableReferenceTerm *p) {
     if (symbolTable.contains(p->ident_)) {
         returnValue(symbolTable[p->ident_]);

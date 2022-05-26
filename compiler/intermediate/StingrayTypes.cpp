@@ -10,21 +10,31 @@ bool SgBaseType::operator==(const SgBaseType &rhs) const { return value == rhs.v
 
 bool SgBaseType::operator!=(const SgBaseType &rhs) const { return !(rhs == *this); }
 
-bool SgBaseType::equals(StingrayType *type) const {
+bool SgBaseType::equals(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        return type->equals(this);
+    }
+
     if (type->typeCategory == TypeCategory::BASE) {
-        return *this == *dynamic_cast<SgBaseType *>(type);
+        return *this == *dynamic_cast<const SgBaseType *>(type);
     } else {
         return false;
     }
 }
 
-bool SgBaseType::coercesTo(StingrayType *type) const {
+bool SgBaseType::coercesTo(const StingrayType *type) const {
+
+    if (type->typeCategory == TypeCategory::AUTO) {
+        auto *baseType = dynamic_cast<const SgAutoType *>(type);
+        baseType->coercedBy(this);
+        return true;
+    }
 
     if (type->typeCategory != TypeCategory::BASE) {
         return false;
     }
 
-    auto *bType = dynamic_cast<SgBaseType *>(type);
+    auto *bType = dynamic_cast<const SgBaseType *>(type);
 
     EBaseType lType = value;
     EBaseType rType = bType->value;
@@ -61,31 +71,48 @@ std::string SgBaseType::toString() const {
         return "UNTYPED";
     }
 }
+StingrayType *SgBaseType::copy() const { return new SgBaseType(value); }
 
 SgArrayType::SgArrayType(StingrayType *parentType) : StingrayType(TypeCategory::ARRAY), parentType(parentType) {}
 
-bool SgArrayType::equals(StingrayType *type) const {
+bool SgArrayType::equals(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        return type->equals(this);
+    }
+
     if (type->typeCategory == TypeCategory::ARRAY) {
-        auto *arrType = dynamic_cast<SgArrayType *>(type);
+        auto *arrType = dynamic_cast<const SgArrayType *>(type);
         return arrType->parentType->equals(this->parentType);
     }
 
     return false;
 }
 
-bool SgArrayType::coercesTo(StingrayType *type) const {
+bool SgArrayType::coercesTo(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        auto *baseType = dynamic_cast<const SgAutoType *>(type);
+        baseType->coercedBy(this);
+        return true;
+    }
+
     return this->equals(type) || type->typeCategory == TypeCategory::ARRAY &&
-                                     this->parentType->coercesTo(dynamic_cast<SgArrayType *>(type)->parentType);
+                                     this->parentType->coercesTo(dynamic_cast<const SgArrayType *>(type)->parentType);
 }
 
 std::string SgArrayType::toString() const { return parentType->toString() + "[]"; }
 
+StingrayType *SgArrayType::copy() const { return new SgArrayType(parentType); }
+
 SgFunctionType::SgFunctionType(std::vector<StingrayType *> range, StingrayType *domain)
     : StingrayType(TypeCategory::FUNCTION), range(std::move(range)), domain(domain) {}
 
-bool SgFunctionType::equals(StingrayType *type) const {
+bool SgFunctionType::equals(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        return type->equals(this);
+    }
+
     if (type->typeCategory == TypeCategory::FUNCTION) {
-        auto *fType = dynamic_cast<SgFunctionType *>(type);
+        auto *fType = dynamic_cast<const SgFunctionType *>(type);
 
         if (!domain->equals(fType->domain)) {
             return false;
@@ -107,7 +134,15 @@ bool SgFunctionType::equals(StingrayType *type) const {
     return false;
 }
 
-bool SgFunctionType::coercesTo(StingrayType *type) const { return this->equals(type); }
+bool SgFunctionType::coercesTo(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        auto *baseType = dynamic_cast<const SgAutoType *>(type);
+        baseType->coercedBy(this);
+        return true;
+    }
+
+    return this->equals(type);
+}
 
 std::string SgFunctionType::toString() const {
     std::string rangeStr;
@@ -120,16 +155,27 @@ std::string SgFunctionType::toString() const {
 
 void SgFunctionType::addRangeType(StingrayType *t) { range.push_back(t); }
 
-bool SgClassType::equals(StingrayType *type) const {
+StingrayType *SgFunctionType::copy() const { return new SgFunctionType(range, domain); }
+
+bool SgClassType::equals(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        return type->equals(this);
+    }
+
     if (type->typeCategory == TypeCategory::CLASS) {
-        auto *classT = dynamic_cast<SgClassType *>(type);
+        auto *classT = dynamic_cast<const SgClassType *>(type);
         return classT->className == className;
     }
 
     return false;
 }
 
-bool SgClassType::coercesTo(StingrayType *type) const {
+bool SgClassType::coercesTo(const StingrayType *type) const {
+    if (type->typeCategory == TypeCategory::AUTO) {
+        auto *baseType = dynamic_cast<const SgAutoType *>(type);
+        baseType->coercedBy(this);
+        return true;
+    }
 
     return this->equals(type) || this->parentClass != nullptr && this->parentClass->coercesTo(type);
 }
@@ -170,4 +216,92 @@ StingrayType *SgClassType::get(const std::string &fieldName) {
     } else {
         return nullptr;
     }
+}
+SgClassType::SgClassType(std::string className, StingrayType *parentClass,
+                         std::unordered_map<std::string, StingrayType *> classVariables,
+                         std::unordered_map<std::string, StingrayType *> objectVariables)
+    : StingrayType(TypeCategory::CLASS), className(std::move(className)), parentClass(parentClass),
+      classVariables(std::move(classVariables)), objectVariables(std::move(objectVariables)) {}
+
+StingrayType *SgClassType::copy() const {
+    return new SgClassType(className, parentClass, classVariables, objectVariables);
+}
+
+SgAutoType::SgAutoType() : StingrayType(TypeCategory::AUTO) {}
+
+std::string SgAutoType::toString() const { return "UNDECIDED: (" + constraint->toString() + ")"; }
+
+bool SgAutoType::equals(const StingrayType *type) const {
+
+    if (constraint) {
+        if (constraint->coercesTo(type)) {
+            constraint = type->copy();
+        } else {
+            return false;
+        }
+    } else {
+        constraint = type->copy();
+    }
+
+    return true;
+}
+
+bool SgAutoType::coercesTo(const StingrayType *type) const {
+
+    if (!constraint) {
+        constraint = type->copy();
+        return true;
+    }
+
+    if (!constraint->coercesTo(type)) {
+        decidable = false;
+    }
+
+    if (!type->coercesTo(constraint)) {
+        constraint = type->copy();
+    }
+
+    if (array) {
+        decidable = constraint->typeCategory == TypeCategory::ARRAY;
+    }
+
+    return true;
+}
+
+void SgAutoType::coercedBy(const StingrayType *type) const {
+    if (!constraint) {
+        constraint = type->copy();
+        return;
+    }
+}
+
+StingrayType *SgAutoType::decide() const {
+    if (auto constraintArray = dynamic_cast<SgArrayType *>(constraint)) {
+
+        if (auto constraintUndecided = dynamic_cast<SgAutoType *>(constraintArray->parentType)) {
+            constraintArray->parentType = constraintUndecided->decide();
+            if (!constraint) {
+                decidable = false;
+            }
+        }
+    }
+
+    if (decidable) {
+        return constraint;
+    }
+
+    return nullptr;
+}
+
+StingrayType *SgAutoType::copy() const { return new SgAutoType(); }
+
+bool SgAutoType::isArray() {
+    if (constraint) {
+        decidable = constraint->typeCategory == TypeCategory::ARRAY;
+    } else {
+        array = true;
+        constraint = new SgArrayType(new SgAutoType());
+    }
+
+    return true;
 }

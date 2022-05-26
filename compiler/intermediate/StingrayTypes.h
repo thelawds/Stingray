@@ -3,24 +3,52 @@
 #define COMPILER_STINGRAYTYPES_H
 
 #include <string>
-#include "unordered_map"
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #define ALLOWS_IMPLICIT_CONVERSION
 
 enum class EBaseType { NOTHING, BOOLEAN, INTEGER, DOUBLE, STRING, UNTYPED };
-enum class TypeCategory { BASE, ARRAY, FUNCTION, CLASS };
+enum class TypeCategory { BASE, ARRAY, FUNCTION, CLASS, AUTO };
 
 struct StingrayType {
     const TypeCategory typeCategory;
 
     explicit StingrayType(TypeCategory typeCategory);
 
-    virtual bool equals(StingrayType *) const = 0;
+    virtual bool equals(const StingrayType *) const = 0;
 
-    virtual bool coercesTo(StingrayType *) const = 0;
+    virtual bool coercesTo(const StingrayType *) const = 0;
 
     virtual std::string toString() const = 0;
+
+    virtual StingrayType *copy() const = 0;
+
+    inline virtual bool isArray() { return false; }
+    inline virtual bool isFuncion() { return false; }
+
+};
+
+struct SgAutoType : StingrayType {
+    SgAutoType();
+
+    void coercedBy(const StingrayType *type) const;
+    bool equals(const StingrayType *type) const override;
+    bool coercesTo(const StingrayType *type) const override;
+
+    bool isArray() override;
+
+    inline bool isFuncion() override { return false; }
+
+    std::string toString() const override;
+    virtual StingrayType *copy() const override;
+
+    StingrayType *decide() const;
+
+    mutable bool array{false};
+    mutable bool decidable{true};
+    mutable StingrayType *constraint;
 };
 
 struct SgBaseType : StingrayType {
@@ -32,10 +60,11 @@ struct SgBaseType : StingrayType {
     bool operator==(const SgBaseType &rhs) const;
     bool operator!=(const SgBaseType &rhs) const;
 
-    bool equals(StingrayType *type) const override;
-    bool coercesTo(StingrayType *type) const override;
+    bool equals(const StingrayType *type) const override;
+    bool coercesTo(const StingrayType *type) const override;
 
     std::string toString() const override;
+    virtual StingrayType *copy() const override;
 };
 
 struct SgArrayType : StingrayType {
@@ -43,10 +72,13 @@ struct SgArrayType : StingrayType {
 
     explicit SgArrayType(StingrayType *parentType);
 
-    bool equals(StingrayType *type) const override;
-    bool coercesTo(StingrayType *type) const override;
+    bool equals(const StingrayType *type) const override;
+    bool coercesTo(const StingrayType *type) const override;
 
     std::string toString() const override;
+    virtual StingrayType *copy() const override;
+
+    inline virtual bool isArray() { return true; }
 };
 
 struct SgFunctionType : StingrayType {
@@ -57,10 +89,13 @@ struct SgFunctionType : StingrayType {
 
     void addRangeType(StingrayType *);
 
-    bool equals(StingrayType *type) const override;
-    bool coercesTo(StingrayType *type) const override;
+    bool equals(const StingrayType *type) const override;
+    bool coercesTo(const StingrayType *type) const override;
 
     std::string toString() const override;
+    virtual StingrayType *copy() const override;
+
+    inline virtual bool isFuncion() { return true; }
 };
 
 struct SgClassType : StingrayType {
@@ -70,15 +105,20 @@ struct SgClassType : StingrayType {
     std::unordered_map<std::string, StingrayType *> classVariables;
     std::unordered_map<std::string, StingrayType *> objectVariables;
 
-    SgClassType(std::string name);
+    explicit SgClassType(std::string name);
+    SgClassType(std::string className, StingrayType *parentClass,
+                std::unordered_map<std::string, StingrayType *> classVariables,
+                std::unordered_map<std::string, StingrayType *> objectVariables);
 
-    bool equals(StingrayType *type) const override;
-    bool coercesTo(StingrayType *type) const override;
+    bool equals(const StingrayType *type) const override;
+    bool coercesTo(const StingrayType *type) const override;
     std::string toString() const override;
 
     bool contains(const std::string &fieldName) const;
 
     StingrayType *get(const std::string &fieldName);
+
+    virtual StingrayType *copy() const override;
 };
 
 #endif // COMPILER_STINGRAYTYPES_H

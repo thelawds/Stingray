@@ -4,10 +4,10 @@ void TypeChecker::visitRelationalEquals(RelationalEquals *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
     auto *rhsType = visit(p->expression_2); // validate rhs
 
-    if (lhsType->typeCategory == TypeCategory::BASE && rhsType->typeCategory == TypeCategory::BASE) {
+    if (lhsType->coercesTo(rhsType) || rhsType->coercesTo(lhsType)) {
         returnValue(EBaseType::BOOLEAN);
     } else {
-        error("Types for relational = should be base", p);
+        error("Types for relational = should be equal or derived from common base", p);
     }
 }
 
@@ -15,11 +15,12 @@ void TypeChecker::visitRelationalNotEquals(RelationalNotEquals *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
     auto *rhsType = visit(p->expression_2); // validate rhs
 
-    if (lhsType->typeCategory == TypeCategory::BASE && rhsType->typeCategory == TypeCategory::BASE) {
+    if (lhsType->coercesTo(rhsType) || rhsType->coercesTo(lhsType)) {
         returnValue(EBaseType::BOOLEAN);
     } else {
-        error("Types for relational != should be base", p);
+        error("Types for relational != should be equal or derived from common base", p);
     }
+
 }
 
 void TypeChecker::visitRelationalLess(RelationalLess *p) {
@@ -181,29 +182,21 @@ void TypeChecker::visitArithmeticDifference(ArithmeticDifference *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
     auto *rhsType = visit(p->expression_2); // validate rhs
 
-    if (lhsType->typeCategory == TypeCategory::BASE && rhsType->typeCategory == TypeCategory::BASE) {
-        auto bLhsType = dynamic_cast<SgBaseType *>(lhsType)->value;
-        auto bRhsType = dynamic_cast<SgBaseType *>(rhsType)->value;
+    bool lhsNumeric = lhsType->coercesTo(DOUBLE_TYPE) || lhsType->coercesTo(INTEGER_TYPE);
+    bool rhsNumeric = rhsType->coercesTo(DOUBLE_TYPE) || rhsType->coercesTo(INTEGER_TYPE);
 
-        if (bLhsType == bRhsType && bLhsType == EBaseType::INTEGER) {
+    if (lhsNumeric && rhsNumeric) {
+
+        if (lhsType->equals(INTEGER_TYPE) && rhsType->equals(INTEGER_TYPE)) {
             returnValue(EBaseType::INTEGER);
             return;
-        }
-
-        if (bLhsType == bRhsType && bLhsType == EBaseType::DOUBLE ||
-            bLhsType == EBaseType::DOUBLE && bRhsType == EBaseType::INTEGER ||
-            bLhsType == EBaseType::INTEGER && bRhsType == EBaseType::DOUBLE) {
-
+        } else {
             returnValue(EBaseType::DOUBLE);
             return;
         }
 
-        error("Unexpected types for arithmetic - operator. Expected both numerical, but got: " + lhsType->toString() +
-                  " and " + rhsType->toString(),
-              p);
-
     } else {
-        error("Types for arithmetic - should be base", p);
+        error("Types for arithmetic - should be base numeric", p);
     }
 }
 
@@ -211,29 +204,21 @@ void TypeChecker::visitArithmeticProduct(ArithmeticProduct *p) {
     auto *lhsType = visit(p->expression_1); // validate lhs
     auto *rhsType = visit(p->expression_2); // validate rhs
 
-    if (lhsType->typeCategory == TypeCategory::BASE && rhsType->typeCategory == TypeCategory::BASE) {
-        auto bLhsType = dynamic_cast<SgBaseType *>(lhsType)->value;
-        auto bRhsType = dynamic_cast<SgBaseType *>(rhsType)->value;
+    bool lhsNumeric = lhsType->coercesTo(DOUBLE_TYPE) || lhsType->coercesTo(INTEGER_TYPE);
+    bool rhsNumeric = rhsType->coercesTo(DOUBLE_TYPE) || rhsType->coercesTo(INTEGER_TYPE);
 
-        if (bLhsType == bRhsType && bLhsType == EBaseType::INTEGER) {
+    if (lhsNumeric && rhsNumeric) {
+
+        if (lhsType->equals(INTEGER_TYPE) && rhsType->equals(INTEGER_TYPE)) {
             returnValue(EBaseType::INTEGER);
             return;
-        }
-
-        if (bLhsType == bRhsType && bLhsType == EBaseType::DOUBLE ||
-            bLhsType == EBaseType::DOUBLE && bRhsType == EBaseType::INTEGER ||
-            bLhsType == EBaseType::INTEGER && bRhsType == EBaseType::DOUBLE) {
-
+        } else {
             returnValue(EBaseType::DOUBLE);
             return;
         }
 
-        error("Unexpected types for arithmetic * operator. Expected both numerical, but got: " + lhsType->toString() +
-                  " and " + rhsType->toString(),
-              p);
-
     } else {
-        error("Types for arithmetic * should be base", p);
+        error("Types for arithmetic * should be base numeric", p);
     }
 }
 
@@ -408,7 +393,7 @@ void TypeChecker::visitArrayInitializer(ArrayInitializer *p) {
 
 void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {
     auto *lhsType = visit(p->expression_1);
-    if (lhsType->typeCategory != TypeCategory::ARRAY) {
+    if (!lhsType->isArray()) {
         error("Can not apply [] to the variable of type " + lhsType->toString() + ". Expected array.", p);
     }
 
@@ -417,7 +402,13 @@ void TypeChecker::visitArrayReferenceTerm(ArrayReferenceTerm *p) {
         error("Can not apply [] with index of type " + rhsType->toString() + ". Expected Integer.", p);
     }
 
-    returnValue(dynamic_cast<SgArrayType *>(lhsType)->parentType);
+    auto *arr = dynamic_cast<SgArrayType *>(lhsType);
+
+    if (!arr){
+        arr = dynamic_cast<SgArrayType *>(dynamic_cast<SgAutoType *>(lhsType)->constraint);
+    }
+
+    returnValue(arr->parentType);
 }
 
 void TypeChecker::visitFunctionCallExpr(FunctionCallExpr *p) { returnValue(visit(p->funccall_)); }
@@ -425,8 +416,9 @@ void TypeChecker::visitFunctionCallExpr(FunctionCallExpr *p) { returnValue(visit
 void TypeChecker::visitFunctionCall(FunctionCall *p) {
     auto *refType = visit(p->expression_);
 
-    if (refType->typeCategory == TypeCategory::FUNCTION) {
+    if (refType->isFuncion()) {
         // todo: check parameters
+        // todo: apply type inference
         auto *funcType = dynamic_cast<SgFunctionType *>(refType);
 
         if (funcType->range.size() != p->listexpression_->size()) {

@@ -1,4 +1,5 @@
 #include "TypeChecker.h"
+#include <iostream>
 
 void TypeChecker::visitDeclaration(Declaration *p) {
     if (dynamic_cast<FunctionDefType *>(p->typereference_) || dynamic_cast<FunctionDeclType *>(p->typereference_)) {
@@ -32,8 +33,11 @@ void TypeChecker::visitFunctionDeclaration(FunctionDeclaration *p) {
     currentFunctionType = new SgFunctionType({}, visit(domain));
     range->accept(this);
 
-    returnValue(currentFunctionType);
+    std::cout << "At function " << currentFunctionName << ":" << std::endl;
     printType(currentFunctionName, currentFunctionType);
+    std::cout << "------" << std::endl;
+
+    returnValue(currentFunctionType);
 }
 
 void TypeChecker::visitFunctionDefinition(FunctionDefinition *p) {
@@ -47,11 +51,33 @@ void TypeChecker::visitFunctionDefinition(FunctionDefinition *p) {
     range->accept(this);
 
     symbolTable[currentFunctionName] = currentFunctionType;
-    returnValue(currentFunctionType);
-
-    printType(currentFunctionName, currentFunctionType);
 
     p->body__->accept(this);
+
+    for (auto *&var : currentFunctionType->range) {
+        if (auto *undecided = dynamic_cast<SgAutoType *>(var)) {
+            var = undecided->decide();
+
+            if (!var) {
+                error("Some variables can not be inferred in function " + currentFunctionName, p);
+            }
+        }
+    }
+
+    if (auto *undecided = dynamic_cast<SgAutoType *>(currentFunctionType->domain)) {
+        currentFunctionType->domain = undecided->decide();
+
+        if (!currentFunctionType->domain) {
+            error("Return type can not be inferred in function " + currentFunctionName, p);
+        }
+    }
+
+    returnValue(currentFunctionType);
+
+    std::cout << "At function " << currentFunctionName << ":" << std::endl;
+    symbolTable.forEach(printType);
+    std::cout << "------" << std::endl;
+
     symbolTable.popLayer();
 }
 
@@ -79,7 +105,6 @@ void TypeChecker::visitFunctionParameter(FunctionParameter *p) {
 
     auto *type = visit(p->typereference_);
     symbolTable.putAtCurrentLayer(p->ident_, type);
-    printType(p->ident_, type);
     returnValue(type);
 }
 

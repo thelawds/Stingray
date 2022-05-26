@@ -11,6 +11,7 @@ BoolType.                       TypeReference ::= "Boolean";
 IntegerType.                    TypeReference ::= "Integer";
 DoubleType.                     TypeReference ::= "Double";
 StringType.                     TypeReference ::= "String";
+AutoType.                       TypeReference ::= "Auto";
 FunctionDeclType.               TypeReference ::= FuncDecl;
 FunctionDefType.                TypeReference ::= FuncDefn;
 ArrayType.                      TypeReference ::= TypeReference "[]";
@@ -21,7 +22,7 @@ ClassDeclaration.               ClassDecl ::= "class" Extends Statics "{" CBody 
 
 ExtendsEmpty.                   Extends ::= ;
 ExtendsList.                    Extends ::= "<" Ident ">";
-separator Ident ",";
+terminator Ident ",";
 
 FieldDeclaration.               FieldDef ::= Ident ":" TypeReference;
 FieldDefinition.                FieldDef ::= Ident Value;

@@ -62,6 +62,7 @@ class TypeChecker : public Visitor {
     void visitUserType(UserType *p) override;
     void visitNothingType(NothingType *p) override;
     void visitBoolType(BoolType *p) override;
+    void visitAutoType(AutoType *p) override;
     void visitIntegerType(IntegerType *p) override;
     void visitDoubleType(DoubleType *p) override;
     void visitStringType(StringType *p) override;
@@ -153,6 +154,7 @@ class TypeChecker : public Visitor {
 
     SgBaseType *NOTHING_TYPE = new SgBaseType(EBaseType::NOTHING);
     SgBaseType *INTEGER_TYPE = new SgBaseType(EBaseType::INTEGER);
+    SgBaseType *DOUBLE_TYPE = new SgBaseType(EBaseType::DOUBLE);
 
     PrintAbsyn *printer = new PrintAbsyn();
 

@@ -15,7 +15,6 @@ void TypeChecker::visitClassDeclaration(ClassDeclaration *p) {
 
     symbolTable.popLayer();
     returnValue(currentClassType);
-    printType(currentClassType->className, currentClassType);
 }
 
 void TypeChecker::visitClassType(ClassType *p) { returnValue(visit(p->classdecl_)); }

@@ -24,7 +24,6 @@ void TypeChecker::visitStatementVarDecl(StatementVarDecl *p) {
 
     symbolTable.putAtCurrentLayer(p->ident_, type);
 
-    printType(p->ident_, type);
 }
 
 void TypeChecker::visitStatementVarDef(StatementVarDef *p) {
@@ -38,7 +37,6 @@ void TypeChecker::visitStatementVarDef(StatementVarDef *p) {
     }
 
     symbolTable.putAtCurrentLayer(p->ident_, valueType);
-    printType(p->ident_, valueType);
 }
 
 void TypeChecker::visitStatementVarDefAsc(StatementVarDefAsc *p) {
@@ -51,7 +49,6 @@ void TypeChecker::visitStatementVarDefAsc(StatementVarDefAsc *p) {
 
     if (valueType->coercesTo(ascType)) {
         symbolTable.putAtCurrentLayer(p->ident_, ascType);
-        printType(p->ident_, ascType);
     } else {
         error("Error at variable definition " + p->ident_ + ". Variable type and value type are not the same.", p);
     }

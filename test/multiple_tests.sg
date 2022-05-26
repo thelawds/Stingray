@@ -26,7 +26,20 @@ declare fact as Integer n -> Integer {
     return n * fact(n-1)
 }
 
+declare factInferred as Auto n -> Auto { // Should be Double[][] -> Double[]
+    if (n[3][3] = 0.0) {
+        return [1.0]
+    }
+
+    return [n[4][1] * factInferred(n[1][3]-1)[0]]
+}
+
 declare main as String[] args -> Nothing {
+    let lambda: Auto k -> Auto {
+        let j <- k - 1
+        return [j, k]
+    }
+
     let foo: sayHello 
     let x : Double {empty}
     let y <- 12.32

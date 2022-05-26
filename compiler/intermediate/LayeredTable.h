@@ -5,6 +5,7 @@
 #include <deque>
 #include <string>
 #include <unordered_map>
+#include <functional>
 
 template <typename T> class LayeredTable {
   public:
@@ -43,6 +44,12 @@ template <typename T> class LayeredTable {
 
         putAtCurrentLayer(name, nullptr);
         return symbols[0][name];
+    }
+
+    inline void forEach(std::function<void(std::string, T*)> func) const {
+        for (auto [name, value] : symbols[0]) {
+            func(name, value);
+        }
     }
 
   private:
